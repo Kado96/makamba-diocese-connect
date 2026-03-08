@@ -32,6 +32,7 @@ const AdminDiocese = lazy(() => import("./pages/admin/Diocese"));
 const AdminMinistries = lazy(() => import("./pages/admin/Ministries"));
 const AdminHomepage = lazy(() => import("./pages/admin/Homepage"));
 const AdminUsers = lazy(() => import("./pages/admin/Users"));
+const AdminAddUser = lazy(() => import("./pages/admin/AddUser"));
 const AdminDocumentation = lazy(() => import("./pages/admin/Documentation"));
 
 const queryClient = new QueryClient();
@@ -69,6 +70,7 @@ const App = () => (
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/users/add" element={<AdminAddUser />} />
             <Route path="/admin/sermons" element={<AdminSermons />} />
             <Route path="/admin/announcements" element={<AdminAnnouncements />} />
             <Route path="/admin/testimonials" element={<AdminTestimonials />} />

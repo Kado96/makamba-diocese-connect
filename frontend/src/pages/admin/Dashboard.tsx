@@ -16,6 +16,7 @@ import {
     BarChart3,
     Megaphone
 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -24,6 +25,7 @@ import { useSiteSettings } from "@/hooks/useApi";
 
 const Dashboard = () => {
     const { t, i18n } = useTranslation();
+    const navigate = useNavigate();
     const { data: siteSettings } = useSiteSettings();
     const user = JSON.parse(localStorage.getItem("user") || '{"username": "Admin"}');
     const stats = [
@@ -37,10 +39,10 @@ const Dashboard = () => {
     const isAdmin = userRole === 'admin' || user.is_superuser;
 
     const quickActions = [
-        { label: t('admin_new_sermon', "Nouveau Sermon"), icon: Plus, color: "bg-blue-600", hover: "hover:bg-blue-700", showMsg: "sermons" },
-        ...(isAdmin ? [{ label: t('admin_add_pastor', "Ajouter Pasteur"), icon: Users, color: "bg-emerald-600", hover: "hover:bg-emerald-700", showMsg: "ministries" }] : []),
-        { label: t('admin_view_site', "Voir le Site"), icon: ExternalLink, iconSize: 20, color: "bg-orange-500", hover: "hover:bg-orange-600", showMsg: "site" },
-        ...(isAdmin ? [{ label: t('admin_messages', "Messages"), icon: MessageSquare, color: "bg-purple-500", hover: "hover:bg-purple-600", showMsg: "contact" }] : []),
+        { label: t('admin_new_sermon', "Nouveau Sermon"), icon: Plus, color: "bg-blue-600", hover: "hover:bg-blue-700", path: "/admin/sermons" },
+        ...(isAdmin ? [{ label: t('admin_add_pastor', "Ajouter Pasteur"), icon: Users, color: "bg-emerald-600", hover: "hover:bg-emerald-700", path: "/admin/users/add" }] : []),
+        { label: t('admin_view_site', "Voir le Site"), icon: ExternalLink, iconSize: 20, color: "bg-orange-500", hover: "hover:bg-orange-600", path: "/", external: true },
+        ...(isAdmin ? [{ label: t('admin_messages', "Messages"), icon: MessageSquare, color: "bg-purple-500", hover: "hover:bg-purple-600", path: "/admin/testimonials" }] : []),
     ];
 
     return (
@@ -68,6 +70,8 @@ const Dashboard = () => {
                         <motion.div
                             key={i}
                             whileHover={{ y: -5 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => action.external ? window.open(action.path, '_blank') : navigate(action.path || '')}
                             className={`${action.color} ${action.hover} p-6 rounded-[2rem] text-white shadow-xl shadow-current/10 cursor-pointer transition-all flex flex-col items-center justify-center gap-4 group relative overflow-hidden`}
                         >
                             <div className="absolute top-0 right-0 p-8 bg-white/10 rounded-full translate-x-1/2 -translate-y-1/2 blur-2xl group-hover:scale-150 transition-transform duration-500"></div>

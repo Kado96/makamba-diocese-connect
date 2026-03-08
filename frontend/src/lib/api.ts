@@ -23,7 +23,7 @@ import type {
 import axios from 'axios';
 
 // URL de base configurable via .env
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://makamba-diocese-connect.onrender.com';
 
 /**
  * Instance Axios configurée pour l'API
