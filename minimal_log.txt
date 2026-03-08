@@ -1,0 +1,3 @@
+Script started
+CWD: E:\Application\Makamba\makamba-diocese-connect
+Django import failed: No module named 'django'

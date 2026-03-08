@@ -1,0 +1,38 @@
+[tool.pyright]
+include = ["."]
+exclude = [
+    "**/__pycache__",
+    "**/node_modules",
+    "**/venv",
+    "**/.venv"
+]
+venvPath = "."
+venv = "venv"
+pythonVersion = "3.10"
+pythonPlatform = "Windows"
+typeCheckingMode = "basic"
+reportMissingImports = "error"
+reportMissingTypeStubs = false
+reportMissingModuleSource = "error"
+
+[tool.pyright.executionEnvironments]
+root = "."
+extraPaths = ["venv/Lib/site-packages"]
+
+[tool.basedpyright]
+include = ["."]
+exclude = [
+    "**/__pycache__",
+    "**/node_modules",
+    "**/venv",
+    "**/.venv"
+]
+venvPath = "."
+venv = "venv"
+pythonVersion = "3.10"
+pythonPlatform = "Windows"
+typeCheckingMode = "basic"
+reportMissingImports = "error"
+reportMissingTypeStubs = false
+extraPaths = ["venv/Lib/site-packages"]
+
