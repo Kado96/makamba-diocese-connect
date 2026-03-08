@@ -19,6 +19,21 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
+  build: {
+    // Augmente la limite de taille des fichiers avant de générer un avertissement
+    chunkSizeWarningLimit: 2000,
+    rollupOptions: {
+      output: {
+        // Regroupe toutes les librairies externes (node_modules) dans un seul fichier 'vendor'
+        // au lieu d'avoir des dizaines de petits fichiers JS.
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
     alias: {
