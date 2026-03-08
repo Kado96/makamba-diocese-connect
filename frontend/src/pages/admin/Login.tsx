@@ -46,10 +46,19 @@ const Login = () => {
 
             navigate("/admin");
         } catch (error: any) {
+            let errorMessage = t('admin_login_error_desc', "Identifiants invalides.");
+
+            if (!error.response) {
+                // Erreur réseau (ex: serveur injoignable, CORS bloqué, ou localhost dans .env)
+                errorMessage = t('admin_login_error_network', "Impossible de contacter le serveur. Vérifiez votre connexion internet.");
+            } else if (error.response.data?.detail) {
+                errorMessage = error.response.data.detail;
+            }
+
             toast({
                 variant: "destructive",
                 title: t('admin_login_error_title', "Erreur de connexion"),
-                description: error.response?.data?.detail || t('admin_login_error_desc', "Identifiants invalides."),
+                description: errorMessage,
             });
         } finally {
             setIsLoading(false);

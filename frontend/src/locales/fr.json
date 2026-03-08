@@ -180,6 +180,7 @@
     "admin_login_success": "Connexion réussie",
     "admin_login_error_title": "Erreur de connexion",
     "admin_login_error_desc": "Identifiants invalides.",
+    "admin_login_error_network": "Impossible de contacter le serveur. Vérifiez votre connexion internet.",
     "admin_subtitle": "Administration",
     "admin_category_label": "Type",
     "admin_date_label": "Date",

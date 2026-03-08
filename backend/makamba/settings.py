@@ -196,13 +196,17 @@ from corsheaders.defaults import default_headers
 if not DEBUG:
     CORS_ALLOWED_ORIGINS = [
         "https://anglicanemakamba.wuaze.com",
+        "http://anglicanemakamba.wuaze.com",
         "https://www.anglicanemakamba.wuaze.com",
+        "http://www.anglicanemakamba.wuaze.com",
         "https://makamba-diocese-connect.onrender.com",
     ]
     # Domaines de confiance pour les requêtes CSRF (formulaires, API PATCH/POST)
     CSRF_TRUSTED_ORIGINS = [
         "https://anglicanemakamba.wuaze.com",
+        "http://anglicanemakamba.wuaze.com",
         "https://www.anglicanemakamba.wuaze.com",
+        "http://www.anglicanemakamba.wuaze.com",
         "https://makamba-diocese-connect.onrender.com",
     ]
 else:

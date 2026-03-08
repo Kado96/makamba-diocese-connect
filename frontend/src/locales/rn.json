@@ -178,6 +178,7 @@
     "admin_username_placeholder": "Izina ry'uwukoresha",
     "admin_welcome": "Ikaze",
     "admin_login_success": "Iwinjira ryagenze neza",
+    "admin_login_error_network": "Ntitwashoboye gushikira server. Raba ko ufise internet.",
     "admin_login_error_title": "Iryo kosa mu kwinjira",
     "admin_login_error_desc": "Amazina canke ibanga si vyo.",
     "admin_subtitle": "Ubuyobozi",

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useTranslation } from "react-i18next";
 import { UserCog, Plus, Search, Trash2, Edit2, ShieldAlert } from "lucide-react";
@@ -45,6 +46,7 @@ interface User {
 
 const UsersManagement = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const { toast } = useToast();
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
@@ -230,69 +232,13 @@ const UsersManagement = () => {
                         />
                     </div>
 
-                    <Dialog open={isAddModalOpen} onOpenChange={(open) => {
-                        setIsAddModalOpen(open);
-                        if (!open) resetForm();
-                    }}>
-                        <DialogTrigger asChild>
-                            <Button className="bg-teal-600 hover:bg-teal-700">
-                                <Plus className="h-4 w-4 mr-2" />
-                                {t('admin_new_user', "Nouvel Utilisateur")}
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>{t('admin_create_account', "Créer un compte")}</DialogTitle>
-                                <DialogDescription>
-                                    {t('admin_add_user_desc', "Ajoutez un nouvel administrateur ou modérateur système.")}
-                                </DialogDescription>
-                            </DialogHeader>
-
-                            <div className="grid gap-4 py-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label>{t('admin_first_name', "Prénom")}</Label>
-                                        <Input name="first_name" value={formData.first_name} onChange={handleInputChange} />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>{t('admin_last_name', "Nom")}</Label>
-                                        <Input name="last_name" value={formData.last_name} onChange={handleInputChange} />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>{t('admin_username_label', "Nom d'utilisateur")} *</Label>
-                                    <Input name="username" value={formData.username} onChange={handleInputChange} required />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Email</Label>
-                                    <Input name="email" type="email" value={formData.email} onChange={handleInputChange} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>{t('admin_password_label', "Mot de passe")} *</Label>
-                                    <Input name="password" type="password" value={formData.password} onChange={handleInputChange} required />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>{t('admin_role_privileges', "Rôle (Privilèges)")}</Label>
-                                    <Select value={formData.role} onValueChange={handleRoleChange}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder={t('admin_select_placeholder', "Sélectionnez un rôle")} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="admin">{t('admin_role_admin_desc', "Administrateur (Tous les droits)")}</SelectItem>
-                                            <SelectItem value="user">{t('admin_role_user_desc', "Utilisateur (Actualités & Ressources uniquement)")}</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </div>
-
-                            <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>{t('admin_cancel', "Annuler")}</Button>
-                                <Button onClick={handleCreate} disabled={!formData.username || !formData.password}>
-                                    {t('admin_create_account_btn', "Créer le compte")}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                    <Button
+                        className="bg-teal-600 hover:bg-teal-700"
+                        onClick={() => navigate("/admin/users/add")}
+                    >
+                        <Plus className="h-4 w-4 mr-2" />
+                        {t('admin_new_user', "Nouvel Utilisateur")}
+                    </Button>
                 </div>
 
                 <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
