@@ -116,6 +116,7 @@ const AddUser = () => {
                                         value={formData.first_name}
                                         onChange={handleInputChange}
                                         placeholder="Ex: Jean"
+                                        autoComplete="given-name"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -126,6 +127,7 @@ const AddUser = () => {
                                         value={formData.last_name}
                                         onChange={handleInputChange}
                                         placeholder="Ex: Ndayizeye"
+                                        autoComplete="family-name"
                                     />
                                 </div>
                             </div>
@@ -142,6 +144,7 @@ const AddUser = () => {
                                         onChange={handleInputChange}
                                         required
                                         placeholder="Utilisé pour la connexion"
+                                        autoComplete="username"
                                     />
                                 </div>
                             </div>
@@ -158,6 +161,7 @@ const AddUser = () => {
                                         value={formData.email}
                                         onChange={handleInputChange}
                                         placeholder="pastor@example.com"
+                                        autoComplete="email"
                                     />
                                 </div>
                             </div>
@@ -186,6 +190,7 @@ const AddUser = () => {
                                             value={formData.password}
                                             onChange={handleInputChange}
                                             required
+                                            autoComplete="new-password"
                                         />
                                     </div>
                                 </div>

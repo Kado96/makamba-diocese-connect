@@ -43,6 +43,7 @@ class UserManagementViewSet(viewsets.ViewSet):
         first_name = request.data.get('first_name', '').strip()
         last_name = request.data.get('last_name', '').strip()
         role = request.data.get('role', 'user')
+        is_active = request.data.get('is_active', True)
         
         if not username or not password:
             return Response(
@@ -52,35 +53,41 @@ class UserManagementViewSet(viewsets.ViewSet):
         
         if User.objects.filter(username=username).exists():
             return Response(
-                {'error': 'Ce nom d\'utilisateur existe déjà.'},
+                {'error': f'Le nom d\'utilisateur "{username}" est déjà utilisé.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
         # Créer l'utilisateur Django
-        user = User.objects.create_user(
-            username=username,
-            password=password,
-            email=email,
-            first_name=first_name,
-            last_name=last_name,
-            is_staff=True,  # Nécessaire pour accéder à l'admin
-        )
-        
-        # Créer ou mettre à jour l'Account avec le rôle
-        account, _ = Account.objects.get_or_create(user=user)
-        account.role = role
-        account.save()
-        
-        return Response({
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'role': account.role,
-            'is_active': user.is_active,
-            'message': f'Utilisateur "{username}" créé avec succès en tant que {account.get_role_display()}.'
-        }, status=status.HTTP_201_CREATED)
+        try:
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                is_staff=True,
+                is_active=is_active
+            )
+            
+            # Créer ou mettre à jour l'Account avec le rôle
+            account, _ = Account.objects.get_or_create(user=user)
+            account.role = role
+            account.is_active = is_active
+            account.save()
+            
+            return Response({
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'role': account.role,
+                'is_active': user.is_active,
+                'message': f'Utilisateur "{username}" créé avec succès.'
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(
+                {'error': f'Erreur lors de la création: {str(e)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
     
     def partial_update(self, request, pk=None):
         """Modifier un utilisateur existant"""
