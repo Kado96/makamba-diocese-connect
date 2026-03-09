@@ -308,6 +308,8 @@
     "admin_role_admin": "Umurongozi",
     "admin_role_user": "Uwukoresha asanzwe",
     "admin_cancel": "Hevya",
+    "admin_user_active_label": "Konti irakora",
+    "admin_user_active_desc": "Uwukoresha azoshobora kwinjira ku rubuga buzira kunkanya.",
     "admin_create_account_btn": "Ubaka konti",
     "admin_user_column": "Uwukoresha",
     "admin_id_column": "Irangamuvunyi",

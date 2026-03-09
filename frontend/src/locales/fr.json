@@ -308,6 +308,8 @@
     "admin_role_admin": "Administrateur",
     "admin_role_user": "Utilisateur standard",
     "admin_cancel": "Annuler",
+    "admin_user_active_label": "Compte actif",
+    "admin_user_active_desc": "L'utilisateur pourra se connecter au système.",
     "admin_create_account_btn": "Créer le compte",
     "admin_user_column": "Utilisateur",
     "admin_id_column": "Identifiant",

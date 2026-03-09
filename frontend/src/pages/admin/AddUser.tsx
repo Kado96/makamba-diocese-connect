@@ -13,6 +13,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { api } from "@/lib/api";
@@ -211,7 +212,21 @@ const AddUser = () => {
                                             ? t('admin_role_admin_desc', "Donne accès à tous les menus.")
                                             : t('admin_role_user_desc', "Donne accès aux Actualités et Ressources uniquement.")}
                                     </p>
-                                </div>
+                                    <div className="space-y-2 pt-2">
+                                        <div className="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50/30">
+                                            <div className="space-y-0.5">
+                                                <Label htmlFor="is_active_switch" className="text-sm font-bold cursor-pointer">{t('admin_user_active_label', "Compte actif")}</Label>
+                                                <p className="text-[10px] text-slate-400">
+                                                    {t('admin_user_active_desc', "L'utilisateur pourra se connecter au système.")}
+                                                </p>
+                                            </div>
+                                            <Switch
+                                                id="is_active_switch"
+                                                checked={formData.is_active}
+                                                onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                                            />
+                                        </div>
+                                    </div>
                             </CardContent>
                         </Card>
 

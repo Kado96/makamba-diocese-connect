@@ -30,6 +30,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { api } from "@/lib/api";
 
@@ -353,30 +354,57 @@ const UsersManagement = () => {
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label>{t('admin_first_name', "Prénom")}</Label>
-                                    <Input name="first_name" value={formData.first_name} onChange={handleInputChange} />
+                                    <Label htmlFor="edit_first_name">{t('admin_first_name', "Prénom")}</Label>
+                                    <Input
+                                        id="edit_first_name"
+                                        name="first_name"
+                                        value={formData.first_name}
+                                        onChange={handleInputChange}
+                                        autoComplete="given-name"
+                                    />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>{t('admin_last_name', "Nom")}</Label>
-                                    <Input name="last_name" value={formData.last_name} onChange={handleInputChange} />
+                                    <Label htmlFor="edit_last_name">{t('admin_last_name', "Nom")}</Label>
+                                    <Input
+                                        id="edit_last_name"
+                                        name="last_name"
+                                        value={formData.last_name}
+                                        onChange={handleInputChange}
+                                        autoComplete="family-name"
+                                    />
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label>Email</Label>
-                                <Input name="email" type="email" value={formData.email} onChange={handleInputChange} />
+                                <Label htmlFor="edit_email">Email</Label>
+                                <Input
+                                    id="edit_email"
+                                    name="email"
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    autoComplete="email"
+                                />
                             </div>
                             <div className="space-y-2">
-                                <Label>{t('admin_new_password_optional', "Nouveau mot de passe (optionnel)")}</Label>
-                                <Input name="password" type="password" value={formData.password} onChange={handleInputChange} placeholder={t('admin_password_hint', "Laisser vide pour ne pas modifier")} />
+                                <Label htmlFor="edit_password">{t('admin_new_password_optional', "Nouveau mot de passe (optionnel)")}</Label>
+                                <Input
+                                    id="edit_password"
+                                    name="password"
+                                    type="password"
+                                    value={formData.password}
+                                    onChange={handleInputChange}
+                                    placeholder={t('admin_password_hint', "Laisser vide pour ne pas modifier")}
+                                    autoComplete="new-password"
+                                />
                             </div>
                             <div className="space-y-2">
-                                <Label>{t('admin_role_privileges', "Rôle (Privilèges)")}</Label>
+                                <Label htmlFor="edit_role">{t('admin_role_privileges', "Rôle (Privilèges)")}</Label>
                                 <Select
                                     value={formData.role}
                                     onValueChange={handleRoleChange}
                                     disabled={selectedUser?.is_superuser}
                                 >
-                                    <SelectTrigger>
+                                    <SelectTrigger id="edit_role">
                                         <SelectValue placeholder={t('admin_select_placeholder', "Sélectionnez un rôle")} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -384,6 +412,21 @@ const UsersManagement = () => {
                                         <SelectItem value="user">{t('admin_role_user_desc', "Utilisateur (Actualités & Ressources uniquement)")}</SelectItem>
                                     </SelectContent>
                                 </Select>
+                            </div>
+
+                            <div className="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50/30 mt-2">
+                                <div className="space-y-0.5">
+                                    <Label htmlFor="edit_is_active" className="text-sm font-bold cursor-pointer">{t('admin_user_active_label', "Compte actif")}</Label>
+                                    <p className="text-[10px] text-slate-400">
+                                        {t('admin_user_active_desc', "L'utilisateur pourra se connecter au système.")}
+                                    </p>
+                                </div>
+                                <Switch
+                                    id="edit_is_active"
+                                    checked={formData.is_active}
+                                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+                                    disabled={selectedUser?.is_superuser}
+                                />
                             </div>
                         </div>
 
