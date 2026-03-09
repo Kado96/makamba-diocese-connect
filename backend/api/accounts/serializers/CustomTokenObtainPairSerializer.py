@@ -1,4 +1,4 @@
-from .dependencies import *
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .AccountSerializer import BasicAccountSerializer
 from random import randrange
 from datetime import timedelta

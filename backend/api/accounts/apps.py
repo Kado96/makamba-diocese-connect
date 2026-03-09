@@ -13,9 +13,12 @@ class AccountsConfig(AppConfig):
         from django.apps import apps
         import os
 
-        # Utiliser apps.get_model pour éviter les problèmes d'importation circulaire
+        # Utiliser apps.get_model de manière sécurisée
         User = apps.get_model('auth', 'User')
-        Account = apps.get_model('accounts', 'Account')
+        try:
+            Account = apps.get_model('api_accounts', 'Account')
+        except LookupError:
+            Account = apps.get_model('accounts', 'Account')
 
         username = os.environ.get("DJANGO_SUPERUSER_USERNAME", "donald")
         password = os.environ.get("DJANGO_SUPERUSER_PASSWORD", "admin")
