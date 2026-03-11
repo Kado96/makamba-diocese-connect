@@ -227,6 +227,7 @@ const AddUser = () => {
                                             />
                                         </div>
                                     </div>
+                                </div>
                             </CardContent>
                         </Card>
 

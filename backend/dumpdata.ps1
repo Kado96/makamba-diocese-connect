@@ -20,7 +20,6 @@ $env:PYTHONIOENCODING = "utf-8"
 Write-Host "Exportation des données vers $OutputFile..." -ForegroundColor Green
 
 # Exécuter dumpdata avec encodage UTF-8 sans BOM
-# Utiliser utf8NoBOM pour éviter les problèmes avec Django loaddata
 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
 $content = python manage.py dumpdata --exclude auth.permission --exclude contenttypes 2>&1 | Out-String
 $outputPath = Join-Path (Get-Location) $OutputFile
@@ -28,9 +27,9 @@ $outputPath = Join-Path (Get-Location) $OutputFile
 
 if ($LASTEXITCODE -eq 0) {
     $fileSize = (Get-Item $OutputFile).Length
-    Write-Host "✓ Export réussi! Fichier: $OutputFile ($([math]::Round($fileSize/1KB, 2)) KB)" -ForegroundColor Green
+    Write-Host "Export reussi! Fichier: $OutputFile" -ForegroundColor Green
 } else {
-    Write-Host "✗ Erreur lors de l'export" -ForegroundColor Red
+    Write-Host "Erreur lors de l'export" -ForegroundColor Red
     exit 1
 }
 
