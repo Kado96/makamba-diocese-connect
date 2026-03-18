@@ -198,7 +198,7 @@ const AddUser = () => {
 
                                 <div className="space-y-2">
                                     <Label htmlFor="role-select">{t('admin_role_privileges', "Rôle (Privilèges)")}</Label>
-                                    <Select value={formData.role} onValueChange={handleRoleChange}>
+                                    <Select name="role" value={formData.role} onValueChange={handleRoleChange}>
                                         <SelectTrigger id="role-select">
                                             <SelectValue placeholder={t('admin_select_placeholder', "Sélectionnez un rôle")} />
                                         </SelectTrigger>

@@ -124,20 +124,31 @@ Ce script est le "cerveau" de l'opération. Il gère la synchronisation bidirect
 4.  **Ordre des Dépendances** : Le script traite d'abord les tables "parents" (ex: Catégories) avant les tables "enfants" (ex: Sermons) pour éviter les erreurs de clés étrangères.
 
 ### 3. Gestion de la Pagination (DRF) dans le Frontend
-Une erreur fréquente en production est le changement de structure des données dû à la **pagination**.
+Par défaut, Django REST Framework pagine les résultats. En production, l'API renvoie `{ "results": [...] }` au lieu d'une simple liste `[...]`.
+- **Règle** : Toujours utiliser la vérification suivante lors du `fetch` :
+  ```javascript
+  const data = response.data.results || response.data;
+  ```
+- Cela garantit que votre code `.map()` ou `.filter()` ne plantera pas si la structure change.
 
-- **En local** : L'API peut renvoyer une liste directe `[...]`.
-- **En production** : L'API renvoie souvent un objet `{ "results": [...] }`.
+### 4. Accessibilité et Autofill (Formulaires)
+Pour que les navigateurs (Chrome, Safari, etc.) puissent remplir automatiquement les mots de passe et les emails, et pour garantir une bonne accessibilité (Lighthouse) :
+- **ID Unique** : Chaque `Input` doit avoir un `id` correspondant au `htmlFor` de son `Label`.
+- **Attribut Name** : Indispensable pour que le navigateur comprenne ce que contient le champ (ex: `name="email"`).
+- **Auto-complete** : Toujours spécifier le type (ex: `autoComplete="current-password"` ou `"username"`).
 
-**Astuce réutilisable** : Toujours utiliser cette ligne pour récupérer vos données dans le frontend :
-```javascript
-const items = response.data.results || response.data;
-// Ensuite, vérifiez que c'est bien une liste avant de 'mapper' :
-const safeItems = Array.isArray(items) ? items : [];
+**Exemple de structure parfaite :**
+```tsx
+<Label htmlFor="user-email">Email</Label>
+<Input 
+  id="user-email" 
+  name="email" 
+  type="email" 
+  autoComplete="email" 
+/>
 ```
-Cela garantit que votre code `.map()` ou `.filter()` ne plantera jamais, quel que soit le mode (paginé ou non).
 
-### 4. Pourquoi c'est mieux que `dumpdata` ?
+### 5. Pourquoi c'est mieux que `dumpdata` ?
 - **Pas d'écrasement total** : Contrairement à `loaddata`, ce script ne supprime rien en production. Il fusionne les données.
 - **Sécurité** : Si une erreur survient au milieu, la transaction `transaction.atomic` annule tout pour éviter une base de données corrompue.
 - **Liberté** : Vous pouvez modifier un texte en local et l'envoyer en production en 2 secondes sans toucher au code.

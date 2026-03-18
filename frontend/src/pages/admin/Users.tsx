@@ -402,6 +402,7 @@ const UsersManagement = () => {
                             <div className="space-y-2">
                                 <Label htmlFor="edit_role">{t('admin_role_privileges', "Rôle (Privilèges)")}</Label>
                                 <Select
+                                    name="role"
                                     value={formData.role}
                                     onValueChange={handleRoleChange}
                                     disabled={selectedUser?.is_superuser}
