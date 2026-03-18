@@ -131,24 +131,43 @@ En local (SQLite), l'API renvoie souvent une liste directe `[...]`. En productio
 
 - **Erreur Classique** : `data.map is not a function` ou `data.filter is not a function`.
   *⚠️ Cas critique en production (Vite/Rollup) : Si cette erreur survient dans un build compilé, elle prendra souvent la forme `TypeError: _.map is not a function` ou `e.map is not a function`. Le minificateur réduit le nom de votre variable (ex: `categories`) en `_` ou `e`. Si l'API retourne un objet paginé au lieu d'un tableau et que votre code n'est pas sécurisé, le rendu `.map()` fait irrémédiablement crasher l'UI de la page.*
-- **Règle d'or (Safe Array Extraction)** : Pour éviter d'afficher un écran blanc en production, utilisez systèmatiquement cette structure :
-```javascript
-// 1. On s'assure d'avoir TOUJOURS un tableau exploitable
-const safeList = (Array.isArray(data) ? data : (data?.results || []));
+- **L'astuce Architecturale (Le Filtre d'entrée)** : Pour éviter de devoir écrire le code de sécurité sur chaque nouvelle page, la "Rule of Thumb" de ce projet a été d'appliquer la *Safe Array Extraction* directement au sein du connecteur (dans le fichier central `src/lib/api.ts`) pour que chaque appel devienne **100% robuste de base** :
 
-// 2. On effectue le map() ou filter() SEULEMENT sur cette liste sécurisée
-const filtered = safeList.filter(item => 
-  item.title?.toLowerCase().includes(search)
-);
-
-// 3. Dans le JSX
-{safeList.map((item) => (
-  <Card key={item.id} />
-))}
+```typescript
+// Au sein de toutes les fonctions fetch (fetchSermons, fetchActualites, etc.)
+export async function fetchData(lang?: string): Promise<Item[] | null> {
+    const data = await apiFetch<PaginatedResponse<Item>>(`/api/items/?language=${lang}`);
+    
+    // 🔥 L'arme secrète Globale: Si c'est un tableau normal, renvoie-le.
+    // Si c'est un format paginé, renvoie .results. 
+    // Sinon annule (null).
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
+}
 ```
-- **Pourquoi ?** Cela garantit que votre code fonctionne quel que soit le format de réponse (liste simple ou objet `{ results: [] }`) et survit parfaitement à la minification.
+Avec ce simple patch dans l'API, tu assures l'immunité absolue de tout ton frontend web contre les bugs silencieux d'arrays.
 
-### 4. Accessibilité et Autofill (Formulaires)
+### 4. Le Piège Fatal de l'Erreur "405 Method Not Allowed"
+Ce projet nécessite deux hébergements distincts :
+- Le Backend (Python/Django) sur **Render / Heroku**.
+- Le Frontend (App React construite) sur un hébergement mutualisé standard comme **InfinityFree / Wuaze**.
+
+**Symptôme :** Tu saisis de nouvelles informations dans une page *"Admin"*, tu cliques sur Sauvegarder, et rien ne se passe. Dans la console tu vois l'erreur rouge ou jaune : `Failed to load resource: the server responded with a status of 405 (Method Not Allowed)`.
+
+**Le problème (`.env.production`) :**
+Tu as accidentellement défini l'URL de base de ton API sur l'URL de ton site web (React) au lieu du vrai backend (Python). Par exemple :
+```env
+# FAUX (Provoquera l'erreur 405)
+VITE_API_URL=https://monsiteReact.wuaze.com
+```
+L'hébergeur "wuaze" tourne sous Apache pour servir tes fichiers statiques. Quand le Front React lui envoie un `PATCH` ou `POST` pour enregistrer en SQL, Apache panique, car un serveur Web de fichiers ne sait gérer que des requêtes de type `GET`. Il répond IMMÉDIATEMENT = `405 Method Not Allowed`.
+
+```env
+# VRAI (La bonne manière)
+VITE_API_URL=https://monserveur-django-base.onrender.com 
+```
+**Conclusion :** Assure-toi que toutes les requêtes en modifications aillent pointer concrètement vers le cerveau Python.
+
+### 5. Accessibilité et Autofill (Formulaires)
 Pour que les navigateurs (Chrome, Safari, etc.) puissent remplir automatiquement les mots de passe et les emails, et pour garantir une bonne accessibilité (Lighthouse) :
 - **ID Unique** : Chaque `Input` doit avoir un `id` correspondant au `htmlFor` de son `Label`.
 - **Attribut Name** : Indispensable pour que le navigateur comprenne ce que contient le champ (ex: `name="email"`).
@@ -165,10 +184,10 @@ Pour que les navigateurs (Chrome, Safari, etc.) puissent remplir automatiquement
 />
 ```
 
-### 5. Pourquoi c'est mieux que `dumpdata` ?
-- **Pas d'écrasement total** : Contrairement à `loaddata`, ce script ne supprime rien en production. Il fusionne les données.
+### 6. Pourquoi c'est mieux que `dumpdata` ?
+- **Pas d'écrasement total** : Contrairement à `loaddata`, le script local `sync_local_to_prod` ne supprime rien en production. Il fusionne les données de manière bidirectionnelle avec des clés naturelles.
 - **Sécurité** : Si une erreur survient au milieu, la transaction `transaction.atomic` annule tout pour éviter une base de données corrompue.
-- **Liberté** : Vous pouvez modifier un texte en local et l'envoyer en production en 2 secondes sans toucher au code.
+- **Liberté** : Vous pouvez modifier un texte en local et l'envoyer en production en 2 secondes sans toucher au code ni ouvrir PgAdmin.
 
 ---
 © 2026 Diocèse de Makamba - Église Anglicane du Burundi.

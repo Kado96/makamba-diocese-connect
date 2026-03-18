@@ -112,7 +112,7 @@ function normalizeLang(lang?: string): string {
 export async function fetchAnnouncements(lang?: string): Promise<Announcement[] | null> {
     const language = normalizeLang(lang);
     const data = await apiFetch<PaginatedResponse<Announcement>>(`/api/announcements/?language=${language}`);
-    return data?.results ?? null;
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 }
 
 /** Récupérer une annonce par ID */
@@ -128,7 +128,7 @@ export async function fetchAnnouncement(id: number): Promise<Announcement | null
 export async function fetchTestimonials(lang?: string): Promise<Testimonial[] | null> {
     const language = normalizeLang(lang);
     const data = await apiFetch<PaginatedResponse<Testimonial>>(`/api/testimonials/?language=${language}&status=published`);
-    return data?.results ?? null;
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 }
 
 // ==============================================
@@ -139,20 +139,20 @@ export async function fetchTestimonials(lang?: string): Promise<Testimonial[] | 
 export async function fetchSermons(lang?: string): Promise<Sermon[] | null> {
     const language = normalizeLang(lang);
     const data = await apiFetch<PaginatedResponse<Sermon>>(`/api/sermons/?language=${language}`);
-    return data?.results ?? null;
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 }
 
 /** Récupérer les sermons en vedette */
 export async function fetchFeaturedSermons(lang?: string): Promise<Sermon[] | null> {
     const language = normalizeLang(lang);
     const data = await apiFetch<PaginatedResponse<Sermon>>(`/api/sermons/?featured=true&language=${language}`);
-    return data?.results ?? null;
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 }
 
 /** Récupérer les catégories de sermons */
 export async function fetchSermonCategories(): Promise<SermonCategory[] | null> {
     const data = await apiFetch<PaginatedResponse<SermonCategory>>('/api/sermons/categories/');
-    return data?.results ?? null;
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 }
 
 // ==============================================
@@ -169,14 +169,14 @@ export async function fetchSiteSettings(lang?: string): Promise<SiteSettings | n
 /** Récupère les paroisses */
 export const fetchParishes = async (): Promise<Parish[] | null> => {
     const data = await apiFetch<PaginatedResponse<Parish>>(`/api/parishes/`);
-    return data?.results ?? null;
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 };
 
 /** Récupère les ministères */
 export const fetchMinistries = async (lang?: string): Promise<Ministry[] | null> => {
     const language = normalizeLang(lang);
     const data = await apiFetch<PaginatedResponse<Ministry>>(`/api/ministries/?language=${language}`);
-    return data?.results ?? null;
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 };
 
 // ==============================================
@@ -187,28 +187,28 @@ export const fetchMinistries = async (lang?: string): Promise<Ministry[] | null>
 export const fetchTimeline = async (lang?: string): Promise<TimelineEvent[] | null> => {
     const language = normalizeLang(lang);
     const data = await apiFetch<PaginatedResponse<TimelineEvent>>(`/api/pages/timeline/?language=${language}`);
-    return data?.results ?? null;
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 };
 
 /** Récupère les axes de mission */
 export const fetchMissionAxes = async (lang?: string): Promise<MissionAxe[] | null> => {
     const language = normalizeLang(lang);
     const data = await apiFetch<PaginatedResponse<MissionAxe>>(`/api/pages/axes/?language=${language}`);
-    return data?.results ?? null;
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 };
 
 /** Récupère les valeurs de la vision */
 export const fetchVisionValues = async (lang?: string): Promise<VisionValue[] | null> => {
     const language = normalizeLang(lang);
     const data = await apiFetch<PaginatedResponse<VisionValue>>(`/api/pages/values/?language=${language}`);
-    return data?.results ?? null;
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 };
 
 /** Récupère les membres de l'équipe */
 export const fetchTeamMembers = async (lang?: string): Promise<TeamMember[] | null> => {
     const language = normalizeLang(lang);
     const data = await apiFetch<PaginatedResponse<TeamMember>>(`/api/pages/team/?language=${language}`);
-    return data?.results ?? null;
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 };
 
 /** Récupère la présentation complète du diocèse (Singleton) */
