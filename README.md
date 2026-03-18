@@ -127,12 +127,20 @@ Ce script est le "cerveau" de l'opération. Il gère la synchronisation de la ma
 4.  **Ordre des Dépendances** : Le script traite d'abord les tables "parents" (ex: Catégories) avant les tables "enfants" (ex: Sermons) pour éviter les erreurs de clés étrangères.
 
 ### 3. Gestion de la Pagination (DRF) dans le Frontend
-Par défaut, Django REST Framework pagine les résultats. En production, l'API renvoie `{ "results": [...] }` au lieu d'une simple liste `[...]`.
-- **Règle** : Toujours utiliser la vérification suivante lors du `fetch` :
-  ```javascript
-  const data = response.data.results || response.data;
-  ```
-- Cela garantit que votre code `.map()` ou `.filter()` ne plantera pas si la structure change.
+En local (SQLite), l'API renvoie souvent une liste directe `[...]`. En production (Supabase/PostgreSQL), si la pagination est activée, l'API renvoie un objet `{ "results": [...] }`.
+
+- **Erreur Classique** : `data.map is not a function` ou `data.filter is not a function`.
+- **Règle d'or (Safe Array Extraction)** : Pour éviter que votre code ne crash en production, utilisez toujours cette structure de filtrage :
+```javascript
+// 1. On s'assure d'avoir TOUJOURS un tableau exploitable
+const safeList = (Array.isArray(data) ? data : (data?.results || []));
+
+// 2. On effectue le filtrage sur cette liste sécurisée
+const filtered = safeList.filter(item => 
+  item.title?.toLowerCase().includes(search)
+);
+```
+- **Pourquoi ?** Cela garantit que votre code fonctionne quel que soit le format de réponse (liste simple ou objet paginé) et gère les cas où les données ne sont pas encore chargées.
 
 ### 4. Accessibilité et Autofill (Formulaires)
 Pour que les navigateurs (Chrome, Safari, etc.) puissent remplir automatiquement les mots de passe et les emails, et pour garantir une bonne accessibilité (Lighthouse) :

@@ -111,12 +111,9 @@ const AdminTestimonials = () => {
         saveMutation.mutate({ data, id: editingItem?.id });
     };
 
-    const filteredItems = testimonials?.results?.filter((item: any) =>
-        item.author_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.content.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || testimonials?.filter((item: any) =>
-        item.author_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.content.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredItems = (Array.isArray(testimonials) ? testimonials : (testimonials?.results || [])).filter((item: any) =>
+        item.author_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.content?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
     if (isLoading) {

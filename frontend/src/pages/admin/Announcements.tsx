@@ -141,7 +141,7 @@ const AdminAnnouncements = () => {
         saveMutation.mutate({ data: cleanedFormData, id: editingItem?.id });
     };
 
-    const filteredItems = announcements?.results?.filter((item: any) =>
+    const filteredItems = (Array.isArray(announcements) ? announcements : (announcements?.results || [])).filter((item: any) =>
         item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.content?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];

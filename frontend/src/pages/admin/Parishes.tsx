@@ -114,12 +114,9 @@ const AdminParishes = () => {
         saveMutation.mutate({ data: cleanedFormData, id: editingItem?.id });
     };
 
-    const filteredItems = parishes?.results?.filter((item: any) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.zone.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || parishes?.filter((item: any) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.zone.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredItems = (Array.isArray(parishes) ? parishes : (parishes?.results || [])).filter((item: any) =>
+        item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.zone?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
     return (

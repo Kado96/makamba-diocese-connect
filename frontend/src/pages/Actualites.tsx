@@ -21,9 +21,11 @@ const Actualites = () => {
     t('cat_news', "Nouvelles")
   ];
 
+  const announcementList = (Array.isArray(announcements) ? announcements : (announcements?.results || []));
+
   const filtered = activeCategory === t('cat_all', "Toutes")
-    ? announcements
-    : announcements?.filter((a: any) => {
+    ? announcementList
+    : announcementList?.filter((a: any) => {
       // Filtrage en fonction des nouvelles catégories backend (category_display ou category)
       const matchesDisplay = a.category_display === activeCategory;
       const normalizedCat = activeCategory.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");

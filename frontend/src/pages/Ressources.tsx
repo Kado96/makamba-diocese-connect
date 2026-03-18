@@ -19,15 +19,17 @@ const Ressources = () => {
   } | null>(null);
 
   // Filtrage intelligent selon les types de l'admin
-  const videoResources = sermons?.filter(s =>
+  const sermonList = (Array.isArray(sermons) ? sermons : (sermons?.results || []));
+
+  const videoResources = sermonList.filter(s =>
     s.content_type === 'youtube' || s.content_type === 'video'
   ) || [];
 
-  const audioResources = sermons?.filter(s =>
+  const audioResources = sermonList.filter(s =>
     s.content_type === 'audio'
   ) || [];
 
-  const documentResources = sermons?.filter(s =>
+  const documentResources = sermonList.filter(s =>
     s.content_type === 'document'
   ) || [];
 

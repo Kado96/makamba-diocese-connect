@@ -135,9 +135,9 @@ const AdminSermons = () => {
         }
     });
 
-    const filteredSermons = sermons?.results?.filter((sermon: any) =>
-        sermon.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sermon.preacher_name.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredSermons = (Array.isArray(sermons) ? sermons : []).filter((sermon: any) =>
+        sermon.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sermon.preacher_name?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
     return (

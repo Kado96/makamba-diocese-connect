@@ -100,10 +100,10 @@ const AdminMinistries = () => {
         saveMutation.mutate({ data: cleanedFormData, id: editingItem?.id });
     };
 
-    const filteredMinistries = ministries?.filter((m: any) =>
-        m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.mission.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredMinistries = (Array.isArray(ministries) ? ministries : (ministries?.results || [])).filter((m: any) =>
+        m.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        m.mission?.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || [];
 
     if (isLoading) {
         return (

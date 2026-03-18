@@ -28,7 +28,7 @@ const ICON_MAP: Record<string, any> = {
 const Ministeres = () => {
   const { data: apiMinistries, isLoading } = useMinistries();
   const { t } = useTranslation();
-  const displayMinistries = apiMinistries || [];
+  const displayMinistries = (Array.isArray(apiMinistries) ? apiMinistries : (apiMinistries?.results || []));
 
   return (
     <div className="min-h-screen bg-background">

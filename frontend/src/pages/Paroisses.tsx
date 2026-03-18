@@ -17,11 +17,11 @@ const Paroisses = () => {
   const [activeZone, setActiveZone] = useState("Toutes");
   const { t } = useTranslation();
 
-  const displayParishes = apiParishes || [];
+  const displayParishes = (Array.isArray(apiParishes) ? apiParishes : (apiParishes?.results || []));
 
   const filtered = activeZone === "Toutes"
     ? displayParishes
-    : displayParishes.filter((p) => p.zone === activeZone);
+    : displayParishes.filter((p: any) => p.zone === activeZone);
 
   return (
     <div className="min-h-screen bg-[#FDFDFD] flex flex-col font-body">
