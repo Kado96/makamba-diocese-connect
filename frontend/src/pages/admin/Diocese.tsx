@@ -382,19 +382,19 @@ const AdminDiocese = () => {
                                     exit={{ opacity: 0, y: -20 }}
                                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                                 >
-                                    {currentTab === "timeline" && timeline?.map((item: any) => (
+                                    {currentTab === "timeline" && (Array.isArray(timeline) ? timeline : (timeline?.results || [])).map((item: any) => (
                                         <ItemCard key={item.id} title={item.year} subtitle={item.title} content={item.description} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "timeline", id: item.id })} />
                                     ))}
 
-                                    {currentTab === "vision" && axes?.map((item: any) => (
+                                    {currentTab === "vision" && (Array.isArray(axes) ? axes : (axes?.results || [])).map((item: any) => (
                                         <ItemCard key={item.id} title={`${t('admin_axe_label', 'Axe')} #${item.order}`} content={item.text} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "axes", id: item.id })} />
                                     ))}
 
-                                    {currentTab === "values" && values?.map((item: any) => (
+                                    {currentTab === "values" && (Array.isArray(values) ? values : (values?.results || [])).map((item: any) => (
                                         <ItemCard key={item.id} title={item.title} icon={item.icon} content={item.description} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "values", id: item.id })} />
                                     ))}
 
-                                    {currentTab === "team" && team?.map((item: any) => (
+                                    {currentTab === "team" && (Array.isArray(team) ? team : (team?.results || [])).map((item: any) => (
                                         <ItemCard key={item.id} title={item.name} subtitle={item.role} content={item.description} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "team", id: item.id })} />
                                     ))}
                                 </motion.div>

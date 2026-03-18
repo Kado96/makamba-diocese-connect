@@ -130,17 +130,23 @@ Ce script est le "cerveau" de l'opération. Il gère la synchronisation de la ma
 En local (SQLite), l'API renvoie souvent une liste directe `[...]`. En production (Supabase/PostgreSQL), si la pagination est activée, l'API renvoie un objet `{ "results": [...] }`.
 
 - **Erreur Classique** : `data.map is not a function` ou `data.filter is not a function`.
-- **Règle d'or (Safe Array Extraction)** : Pour éviter que votre code ne crash en production, utilisez toujours cette structure de filtrage :
+  *⚠️ Cas critique en production (Vite/Rollup) : Si cette erreur survient dans un build compilé, elle prendra souvent la forme `TypeError: _.map is not a function` ou `e.map is not a function`. Le minificateur réduit le nom de votre variable (ex: `categories`) en `_` ou `e`. Si l'API retourne un objet paginé au lieu d'un tableau et que votre code n'est pas sécurisé, le rendu `.map()` fait irrémédiablement crasher l'UI de la page.*
+- **Règle d'or (Safe Array Extraction)** : Pour éviter d'afficher un écran blanc en production, utilisez systèmatiquement cette structure :
 ```javascript
 // 1. On s'assure d'avoir TOUJOURS un tableau exploitable
 const safeList = (Array.isArray(data) ? data : (data?.results || []));
 
-// 2. On effectue le filtrage sur cette liste sécurisée
+// 2. On effectue le map() ou filter() SEULEMENT sur cette liste sécurisée
 const filtered = safeList.filter(item => 
   item.title?.toLowerCase().includes(search)
 );
+
+// 3. Dans le JSX
+{safeList.map((item) => (
+  <Card key={item.id} />
+))}
 ```
-- **Pourquoi ?** Cela garantit que votre code fonctionne quel que soit le format de réponse (liste simple ou objet paginé) et gère les cas où les données ne sont pas encore chargées.
+- **Pourquoi ?** Cela garantit que votre code fonctionne quel que soit le format de réponse (liste simple ou objet `{ results: [] }`) et survit parfaitement à la minification.
 
 ### 4. Accessibilité et Autofill (Formulaires)
 Pour que les navigateurs (Chrome, Safari, etc.) puissent remplir automatiquement les mots de passe et les emails, et pour garantir une bonne accessibilité (Lighthouse) :

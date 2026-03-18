@@ -184,7 +184,7 @@ const AdminSermons = () => {
                                         <label htmlFor="sermon-category" className="text-sm font-bold text-slate-700">{t('admin_category_label', 'Catégorie')}</label>
                                         <select id="sermon-category" name="category" defaultValue={editingItem?.category} className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
                                             <option value="">{t('admin_select_placeholder', 'Sélectionner...')}</option>
-                                            {categories?.map((cat: any) => (
+                                            {(Array.isArray(categories) ? categories : (categories?.results || [])).map((cat: any) => (
                                                 <option key={cat.id} value={cat.id}>{cat.name}</option>
                                             ))}
                                         </select>
