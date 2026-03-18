@@ -67,10 +67,6 @@ from api.sermons.models import SermonCategory, Sermon
 from api.pages.models import TimelineEvent, VisionValue, MissionAxe, TeamMember, DiocesePresentation
 
 class MakambaSync:
-    def __init__(self, dry_run=False):
-        self.dry_run = dry_run
-        self.stats = {'created': 0, 'updated': 0, 'errors': 0}
-        self._setup_prod_db()
 
     def _setup_prod_db(self):
         """Configure la connexion secondaire pour PostgreSQL/Supabase en héritant du moteur par défaut"""
@@ -112,12 +108,17 @@ class MakambaSync:
         self.dry_run = dry_run
         self.stats = {'created': 0, 'updated': 0, 'errors': 0}
         self.id_map = {} # Stocke la correspondance { 'ModelName': { local_id: prod_id } }
-        self._test_connection()
+        self._setup_prod_db()
 
     def _get_natural_query(self, model_class, item):
         """Définit comment identifier un objet sans son ID"""
         if model_class == User:
             return {'username': item.username}
+        if model_class == Account:
+            # Pour un profil, la clé naturelle est l'utilisateur rattaché
+            # On utilise l'ID traduit (prod) si possible
+            user_id = self.id_map.get('User', {}).get(item.user_id, item.user_id)
+            return {'user_id': user_id}
         if model_class == SiteSettings:
             return {'id': 1} # Singleton
         if model_class == Parish:
@@ -150,11 +151,15 @@ class MakambaSync:
             # 🔄 TRADUCTION DES CLÉS ÉTRANGÈRES
             # Si l'objet dépend d'un autre (ex: Profile -> User), on remplace l'ID local par l'ID prod
             for field in model_class._meta.fields:
-                if field.is_relation and field.name in data and data[field.name]:
-                    related_model_name = field.related_model.__name__
-                    local_id = data[field.name]
-                    if related_model_name in self.id_map and local_id in self.id_map[related_model_name]:
-                        data[field.name] = self.id_map[related_model_name][local_id]
+                if field.is_relation:
+                    # On vérifie field.name (ex: 'user') et field.name + '_id' (ex: 'user_id')
+                    for key in [field.name, f"{field.name}_id"]:
+                        if key in data and data[key]:
+                            related_model_name = field.related_model.__name__
+                            local_id = data[key]
+                            if related_model_name in self.id_map and local_id in self.id_map[related_model_name]:
+                                data[key] = self.id_map[related_model_name][local_id]
+                                logger.debug(f"    [MAP] Traduction {key}: {local_id} -> {data[key]}")
 
             try:
                 with transaction.atomic(using='prod'):

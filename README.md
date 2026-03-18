@@ -106,8 +106,9 @@ Les offres gratuites/standard de Supabase limitent le nombre de clients connect�
 
 ### 2. Le Script `sync_local_to_prod.py`
 Ce script est le "cerveau" de l'opération. Il gère la synchronisation de la manière suivante :
-- **Identification Intelligente** : Le script cherche d'abord les objets par leur ID. Pour les utilisateurs, s'il ne les trouve pas par ID, il cherche par `username` pour éviter de les créer deux fois.
-- **Transactions Isolées (`atomic`)** : Chaque élément (sermon, paroisse, utilisateur) est traité dans une sous-transaction isolée. Si l'un d'eux échoue (ex: un nom en doublon), le script affiche l'erreur et **continue** avec le reste sans s'arrêter.
+- **Identification par "Sens" (Clé Naturelle)** : Au lieu de se fier uniquement aux numéros d'IDs (qui peuvent être différents entre votre PC et Supabase), le script cherche les objets par leur nom (Paroisse), titre (Sermon) ou nom d'utilisateur.
+- **Mappage Dynamique des IDs (Mémoire)** : Si l'ID d'un utilisateur est différent sur Supabase (ex: 12 au lieu de 75), le script mémorise ce changement (`75 -> 12`) et traduit automatiquement toutes les relations (clés étrangères) même s'il s'agit de colonnes techniques (ex: `user_id`).
+- **Fiabilité Maximale** : Chaque élément est traité dans sa propre transaction. Une erreur sur un utilisateur ou un sermon spécifique n'arrêtera jamais la synchronisation des 50 autres éléments.
 - **Mise à jour Intelligente** : S'il trouve un objet identique, il le met à jour (`update`). Sinon, il le crée (`create`).
 1.  **Double Connexion** : Il ouvre deux connexions simultanées :
     *   `default` : La base SQLite locale (Source).
