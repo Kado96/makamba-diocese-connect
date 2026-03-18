@@ -108,36 +108,93 @@ class MakambaSync:
                 data[field.name] = val
         return data
 
+    def __init__(self, dry_run=False):
+        self.dry_run = dry_run
+        self.stats = {'created': 0, 'updated': 0, 'errors': 0}
+        self.id_map = {} # Stocke la correspondance { 'ModelName': { local_id: prod_id } }
+        self._test_connection()
+
+    def _get_natural_query(self, model_class, item):
+        """Définit comment identifier un objet sans son ID"""
+        if model_class == User:
+            return {'username': item.username}
+        if model_class == SiteSettings:
+            return {'id': 1} # Singleton
+        if model_class == Parish:
+            return {'name': item.name}
+        if model_class == Ministry:
+            return {'title': item.title, 'language': item.language}
+        if model_class == SermonCategory:
+            return {'name': item.name}
+        if model_class == Sermon:
+            return {'title': item.title, 'preacher_name': item.preacher_name}
+        if model_class == Announcement:
+            return {'title': item.title, 'language': item.language}
+        if model_class == Testimonial:
+            return {'author_name': item.author_name}
+        if model_class == TeamMember:
+            return {'name': item.name}
+        return None
+
     def sync_model(self, model_class, name):
-        """Synchronise une table spécifique"""
+        """Synchronise une table avec traduction des IDs"""
         logger.info(f"--- Synchronisation: {name} ---")
+        model_name = model_class.__name__
+        self.id_map[model_name] = {}
+        
         local_items = model_class.objects.using('default').all()
         
         for item in local_items:
             data = self._prepare_data(item)
+            
+            # 🔄 TRADUCTION DES CLÉS ÉTRANGÈRES
+            # Si l'objet dépend d'un autre (ex: Profile -> User), on remplace l'ID local par l'ID prod
+            for field in model_class._meta.fields:
+                if field.is_relation and field.name in data and data[field.name]:
+                    related_model_name = field.related_model.__name__
+                    local_id = data[field.name]
+                    if related_model_name in self.id_map and local_id in self.id_map[related_model_name]:
+                        data[field.name] = self.id_map[related_model_name][local_id]
+
             try:
-                # On cherche si l'objet existe déjà en prod par son ID
-                prod_obj = model_class.objects.using('prod').filter(id=item.id).first()
-                
-                if prod_obj:
-                    # Mise à jour
-                    if not self.dry_run:
-                        model_class.objects.using('prod').filter(id=item.id).update(**data)
-                        self.stats['updated'] += 1
-                        logger.info(f"  [UPD] {name} ID {item.id} mis à jour.")
+                with transaction.atomic(using='prod'):
+                    # 1. Recherche : On essaye par ID, puis par Clé Naturelle
+                    prod_obj_query = model_class.objects.using('prod').filter(id=item.id)
+                    
+                    if not prod_obj_query.exists():
+                        natural_criteria = self._get_natural_query(model_class, item)
+                        if natural_criteria:
+                            prod_obj_query = model_class.objects.using('prod').filter(**natural_criteria)
+
+                    if prod_obj_query.exists():
+                        # MISE À JOUR
+                        prod_id = prod_obj_query.first().id
+                        if not self.dry_run:
+                            # On retire l'ID de la mise à jour pour ne pas casser les contraintes
+                            if 'id' in data: del data['id'] 
+                            prod_obj_query.update(**data)
+                            self.stats['updated'] += 1
+                            logger.info(f"  [UPD] {name} '{item}' (ID Prod: {prod_id}) mis à jour.")
+                        else:
+                            logger.info(f"  [SIM] {name} '{item}' serait mis à jour.")
+                        self.id_map[model_name][item.id] = prod_id
                     else:
-                        logger.info(f"  [SIM] {name} ID {item.id} serait mis à jour.")
-                else:
-                    # Création
-                    if not self.dry_run:
-                        data['id'] = item.id
-                        model_class.objects.using('prod').create(**data)
-                        self.stats['created'] += 1
-                        logger.info(f"  [NEW] {name} ID {item.id} créé.")
-                    else:
-                        logger.info(f"  [SIM] {name} ID {item.id} serait créé.")
+                        # CRÉATION
+                        if not self.dry_run:
+                            # Si c'est une création, on essaye de garder le même ID si possible
+                            # mais si l'ID local est déjà pris en prod, on laisse la base en générer un nouveau
+                            if model_class.objects.using('prod').filter(id=item.id).exists():
+                                if 'id' in data: del data['id']
+                            
+                            new_obj = model_class.objects.using('prod').create(**data)
+                            self.stats['created'] += 1
+                            logger.info(f"  [NEW] {name} '{item}' créé (ID Prod: {new_obj.id}).")
+                            self.id_map[model_name][item.id] = new_obj.id
+                        else:
+                            logger.info(f"  [SIM] {name} '{item}' serait créé.")
+                            self.id_map[model_name][item.id] = item.id
             except Exception as e:
-                logger.error(f"  ❌ Erreur sur {name} ID {item.id}: {e}")
+                logger.error(f"  ❌ Erreur sur {name} '{item}': {e}")
                 self.stats['errors'] += 1
 
     def run(self):

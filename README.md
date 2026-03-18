@@ -105,8 +105,10 @@ Dans le fichier `settings.py`, nous utilisons une condition basée sur une varia
 Les offres gratuites/standard de Supabase limitent le nombre de clients connectés simultanément. En travaillant sur **SQLite** localement, vous ne consommez aucune de ces connexions précieuses, vous travaillez plus vite (pas de latence réseau), et vous ne risquez pas de casser les données en ligne par erreur.
 
 ### 2. Le Script `sync_local_to_prod.py`
-Ce script est le "cerveau" de l'opération. Il gère la synchronisation bidirectionnelle de la manière suivante :
-
+Ce script est le "cerveau" de l'opération. Il gère la synchronisation de la manière suivante :
+- **Identification Intelligente** : Le script cherche d'abord les objets par leur ID. Pour les utilisateurs, s'il ne les trouve pas par ID, il cherche par `username` pour éviter de les créer deux fois.
+- **Transactions Isolées (`atomic`)** : Chaque élément (sermon, paroisse, utilisateur) est traité dans une sous-transaction isolée. Si l'un d'eux échoue (ex: un nom en doublon), le script affiche l'erreur et **continue** avec le reste sans s'arrêter.
+- **Mise à jour Intelligente** : S'il trouve un objet identique, il le met à jour (`update`). Sinon, il le crée (`create`).
 1.  **Double Connexion** : Il ouvre deux connexions simultanées :
     *   `default` : La base SQLite locale (Source).
     *   `prod` : La base Supabase distante (Destination).
