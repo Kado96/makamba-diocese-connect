@@ -88,9 +88,6 @@ def serve_media_with_cors(request, path):
 router = routers.DefaultRouter()
 
 urlpatterns = [
-    path('login/', CustomTokenObtainPairView.as_view(), name='login'),
-    path('register/', RegisterViewSet.as_view(), name='register'),
-    path('refresh/', TokenRefreshView.as_view(), name='refresh'),
     path('admin/', admin.site.urls),
     path('api/', MakambaDioceseView.as_view()),
     path('api/test-cors/', test_cors, name="test-cors"),  # Test CORS simple
@@ -103,9 +100,9 @@ urlpatterns = [
     path('api/pages/', include('api.pages.urls')),
     path('api/testimonials/', include("api.testimonials.urls")),
     path('api-auth/', include('rest_framework.urls')),
-    path('api/login/', CustomTokenObtainPairView.as_view(), name="login"),
-    path('api/register/', RegisterViewSet.as_view(), name="register"),
-    path('api/refresh/', TokenRefreshView.as_view()),
+    path('api/login/', CustomTokenObtainPairView.as_view(), name="api-login"),
+    path('api/register/', RegisterViewSet.as_view(), name="api-register"),
+    path('api/refresh/', TokenRefreshView.as_view(), name="api-refresh"),
     # Proxy pour les images Google Drive (résout CORB)
     path('api/image-proxy/', ImageProxyView.as_view(), name='image_proxy'),
     # Route pour le favicon (retourner 404 sans authentification)

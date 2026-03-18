@@ -112,15 +112,6 @@ export interface SiteSettings {
     [key: string]: any;
 }
 
-export interface Course {
-    id: number;
-    title: string;
-    description: string;
-    thumbnail_url: string;
-    is_active: boolean;
-    created_at: string;
-}
-
 export interface Parish {
     id: number;
     name: string;

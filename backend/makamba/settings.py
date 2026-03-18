@@ -42,13 +42,18 @@ DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 # ALLOWED HOSTS
 # ==========================
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "makamba-diocese-connect.onrender.com",
-    "anglicanemakamba.wuaze.com",
-    "www.anglicanemakamba.wuaze.com",
-]
+env_allowed_hosts = os.environ.get("ALLOWED_HOSTS")
+if env_allowed_hosts:
+    ALLOWED_HOSTS = [host.strip() for host in env_allowed_hosts.split(',')]
+else:
+    ALLOWED_HOSTS = [
+        "localhost",
+        "127.0.0.1",
+        "10.10.107.8",
+        "makamba-diocese-connect.onrender.com",
+        "anglicanemakamba.wuaze.com",
+        "www.anglicanemakamba.wuaze.com",
+    ]
 
 # ==========================
 # APPLICATIONS

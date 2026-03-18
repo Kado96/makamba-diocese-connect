@@ -9,7 +9,6 @@ import type {
     Sermon,
     SermonCategory,
     SiteSettings,
-    Course,
     Parish,
     Ministry,
     MissionAxe,
@@ -23,7 +22,7 @@ import type {
 import axios from 'axios';
 
 // URL de base configurable via .env
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://makamba-diocese-connect.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://anglicanemakamba.wuaze.com';
 
 /**
  * Instance Axios configurée pour l'API
@@ -166,14 +165,6 @@ export async function fetchSiteSettings(lang?: string): Promise<SiteSettings | n
     return apiFetch<SiteSettings>(`/api/settings/current/?language=${language}`);
 }
 
-/**
- * Récupère les émissions / cours (Ministères)
- */
-export const fetchCourses = async (lang?: string): Promise<Course[] | null> => {
-    const language = normalizeLang(lang);
-    const data = await apiFetch<PaginatedResponse<Course>>(`/api/courses/?language=${language}`);
-    return data?.results ?? null;
-};
 
 /** Récupère les paroisses */
 export const fetchParishes = async (): Promise<Parish[] | null> => {
@@ -226,25 +217,5 @@ export const fetchDiocesePresentation = async (lang?: string): Promise<DiocesePr
     return await apiFetch<DiocesePresentation>(`/api/pages/diocese-presentation/current/?language=${language}`);
 };
 
-// ==============================================
-// Contact (envoi de message)
-// ==============================================
 
-export interface ContactFormData {
-    name: string;
-    email: string;
-    subject: string;
-    message: string;
-}
-
-/** Envoyer un message via le formulaire de contact */
-export async function sendContactMessage(data: ContactFormData): Promise<boolean> {
-    // Note: L'endpoint /api/announcements/ n'est probablement pas le bon pour le contact.
-    // Mais nous gardons la structure en attendant de confirmer l'existence d'un endpoint de contact dédié.
-    const result = await apiFetch('/api/announcements/', {
-        method: 'POST',
-        body: JSON.stringify(data),
-    });
-    return result !== null;
-}
 

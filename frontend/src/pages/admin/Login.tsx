@@ -25,7 +25,7 @@ const Login = () => {
         setIsLoading(true);
 
         try {
-            const response = await api.post("/login/", { username, password });
+            const response = await api.post("/api/login/", { username, password });
             localStorage.setItem("token", response.data.access);
             localStorage.setItem("refresh", response.data.refresh);
             const userData = {

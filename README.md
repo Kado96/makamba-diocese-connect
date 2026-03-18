@@ -1,73 +1,94 @@
-# Welcome to your Lovable project
+# ⛪ Makamba Diocese Connect
 
-## Project info
+Application complète pour la gestion et la communication du **Diocèse de Makamba (Burundi)**, comprenant un backend Django performant et un frontend React moderne et multilingue.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 🚀 Structure du Projet
 
-## How can I edit this code?
+- **Backend** : Django REST Framework, PostgreSQL (**Supabase**) en production, SQLite en développement local.
+- **Frontend** : React, Vite, Tailwind CSS, TypeScript, Framer Motion (animations).
+- **Langues supportées** : Français (FR), Kirundi (RN), Anglais (EN), Kiswahili (SW).
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🛠️ Workflow de Développement : Local vers Production
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Le projet est configuré pour séparer strictement le développement (local) de la production (Supabase).
 
-Changes made via Lovable will be committed automatically to this repo.
+### Étape 1 : Développement Local (SQLite)
+Travaillez en toute sécurité sur votre machine sans impacter le site en ligne.
 
-**Use your preferred IDE**
+1. Vérifiez que votre fichier `backend/.env` contient :
+   ```env
+   DATABASE_URL=votre_url_supabase_ou_sqlite
+   DEBUG=True
+   ```
+   *Note : Si vous voulez forcer SQLite en local, assurez-vous que `DATABASE_URL` n'est pas défini ou pointe vers un fichier .sqlite3.*
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. **Migrations de structure** : Si vous modifiez `models.py` (ex: ajout d'un champ), générez les migrations :
+   ```powershell
+   cd backend
+   .\venv\Scripts\activate
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Étape 2 : Déploiement et Synchronisation
 
-Follow these steps:
+Quand vos modifications sont prêtes à être publiées :
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+**A. Envoyer le Code (Déploiement Render)** :
+Envoyez votre code sur GitHub. Le site web se mettra à jour automatiquement sur Render.
+```powershell
+git add .
+git commit -m "Description de vos changements"
+git push
 ```
 
-**Edit a file directly in GitHub**
+**B. Synchroniser les Données (Supabase)** :
+Pour envoyer vos nouveaux articles, paroisses ou sermons de votre PC vers le site en ligne, utilisez le script de synchronisation depuis le dossier `backend/` :
+```powershell
+.\venv\Scripts\activate
+python sync_local_to_prod.py
+```
+*Le script compare votre base locale et Supabase pour mettre à jour les données sans créer de doublons.*
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 💻 Installation Rapide
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Backend (Python)
+```powershell
+cd backend
+python -m venv venv
+.\venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
 
-## What technologies are used for this project?
+### Frontend (React/Vite)
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+*Le frontend sera accessible sur `http://localhost:8080`.*
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## ⚙️ Administration et Maintenance
 
-## How can I deploy this project?
+- **Accès Admin** : `/admin/login` sur le frontend ou `/admin` sur le backend.
+- **Initialisation** : Pour réinitialiser les données de base (noms de sections, langues), lancez :
+  ```powershell
+  python populate_defaults.py
+  ```
+- **Images** : Le projet utilise un proxy d'image pour supporter les liens Google Drive sans erreurs de sécurité (CORS).
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## 📝 Notes de Sécurité
+- Le fichier `db.sqlite3` et les fichiers `.env` sont exclus de Git pour protéger vos données et accès.
+- Les accès API sont protégés par des tokens **JWT**.
+- En production (Render/Supabase), les fichiers statiques sont servis via **WhiteNoise**.
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+---
+© 2026 Diocèse de Makamba - Église Anglicane du Burundi.

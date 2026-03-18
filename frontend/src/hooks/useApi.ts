@@ -9,7 +9,6 @@ import {
     fetchSiteSettings,
     fetchSermons,
     fetchSermonCategories,
-    fetchCourses,
     fetchParishes,
     fetchMinistries,
     fetchTimeline,
@@ -24,7 +23,6 @@ import type {
     Sermon,
     SermonCategory,
     SiteSettings,
-    Course,
     Parish,
     Ministry,
     TimelineEvent,
@@ -121,21 +119,7 @@ export function useSiteSettings() {
     });
 }
 
-/**
- * Hook pour les cours/études
- */
-export function useCourses() {
-    const { i18n } = useTranslation();
-    const lang = i18n.language || 'fr';
-    return useQuery<Course[]>({
-        queryKey: ['courses', lang],
-        queryFn: async () => {
-            const data = await fetchCourses(lang);
-            return data ?? [];
-        },
-        staleTime: 10 * 60 * 1000,
-    });
-}
+
 
 /**
  * Hook pour les paroisses

@@ -75,9 +75,9 @@ const AdminParishes = () => {
         mutationFn: async ({ data, id }: { data: FormData, id?: number }) => {
             const config = { headers: { 'Content-Type': 'multipart/form-data' } };
             if (id) {
-                await api.patch(`/api/parishes/admin/${id}/`, data, config);
+                await api.patch(`/api/parishes/${id}/`, data, config);
             } else {
-                await api.post("/api/parishes/admin/", data, config);
+                await api.post("/api/parishes/", data, config);
             }
         },
         onSuccess: (_, variables) => {
@@ -92,7 +92,7 @@ const AdminParishes = () => {
 
     const deleteMutation = useMutation({
         mutationFn: async (id: number) => {
-            await api.delete(`/api/parishes/${id}//`);
+            await api.delete(`/api/parishes/${id}/`);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["admin-parishes"] });
