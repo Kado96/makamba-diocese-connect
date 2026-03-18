@@ -71,7 +71,7 @@ const AdminSermons = () => {
         queryKey: ["admin-sermons"],
         queryFn: async () => {
             const response = await api.get("/api/sermons/admin/");
-            return response.data;
+            return response.data.results || response.data;
         }
     });
 

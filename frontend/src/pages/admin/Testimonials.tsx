@@ -70,7 +70,7 @@ const AdminTestimonials = () => {
         queryKey: ["admin-testimonials", activeLang],
         queryFn: async () => {
             const response = await api.get(`/api/testimonials/?language=${activeLang}`);
-            return response.data;
+            return response.data.results || response.data;
         }
     });
 

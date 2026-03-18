@@ -73,7 +73,7 @@ const AdminAnnouncements = () => {
         queryKey: ["admin-announcements", activeLang],
         queryFn: async () => {
             const response = await api.get(`/api/announcements/admin/?language=${activeLang}`);
-            return response.data;
+            return response.data.results || response.data;
         }
     });
 

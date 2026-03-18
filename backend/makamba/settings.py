@@ -108,15 +108,19 @@ WSGI_APPLICATION = "makamba.wsgi.application"
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
-if DATABASE_URL:
+# Charger les variables (Inclus USE_LOCAL_SQLITE)
+USE_LOCAL_SQLITE = os.getenv('USE_LOCAL_SQLITE', 'False').lower() == 'true'
+
+if DATABASE_URL and not USE_LOCAL_SQLITE:
     DATABASES = {
         "default": dj_database_url.parse(
             DATABASE_URL,
-            conn_max_age=600,
+            conn_max_age=0, # On réduit pour éviter de saturer Supabase
             ssl_require=True
         )
     }
 else:
+    # SQLITE par défaut si USE_LOCAL_SQLITE=True
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",

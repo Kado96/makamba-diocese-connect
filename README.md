@@ -91,4 +91,56 @@ npm run dev
 - En production (Render/Supabase), les fichiers statiques sont servis via **WhiteNoise**.
 
 ---
+
+## 🏗️ Architecture Technique : Synchronisation (Modèle Réutilisable)
+
+Ce projet utilise une architecture de synchronisation "One-Way" (Local -> Prod) très efficace pour les petits et moyens projets. Voici comment la reproduire ailleurs.
+
+### 1. L'Interrupteur de Base de Données (`.env`)
+Dans le fichier `settings.py`, nous utilisons une condition basée sur une variable d'environnement :
+- **`USE_LOCAL_SQLITE=True`** : Django utilise `db.sqlite3`. C'est **obligatoire** en développement pour éviter l'erreur `MaxClientsInSessionMode` de Supabase (limite de connexions atteintes).
+- **`DATABASE_URL=...`** (et `USE_LOCAL_SQLITE=False`) : Utilisé uniquement par le serveur en production ou par le script de synchronisation.
+
+**Pourquoi cette approche ?**
+Les offres gratuites/standard de Supabase limitent le nombre de clients connectés simultanément. En travaillant sur **SQLite** localement, vous ne consommez aucune de ces connexions précieuses, vous travaillez plus vite (pas de latence réseau), et vous ne risquez pas de casser les données en ligne par erreur.
+
+### 2. Le Script `sync_local_to_prod.py`
+Ce script est le "cerveau" de l'opération. Il gère la synchronisation bidirectionnelle de la manière suivante :
+
+1.  **Double Connexion** : Il ouvre deux connexions simultanées :
+    *   `default` : La base SQLite locale (Source).
+    *   `prod` : La base Supabase distante (Destination).
+2.  **Composants Synchronisés** :
+    *   👤 **Sécurité** : Utilisateurs et Profils (Comptes).
+    *   ⚙️ **Configuration** : Paramètres du site (Textes, Logos, Couleurs).
+    *   ⛪ **Église** : Paroisses, Ministères et leurs activités.
+    *   📖 **Enseignement** : Sermons et leurs catégories.
+    *   📰 **Communication** : Annonces, Articles et Témoignages.
+    *   📄 **Contenu Web** : Timeline, Valeurs, Vision, Équipe et Présentation du Diocèse.
+3.  **Vérification d'Existence** : Pour chaque élément :
+    *   Il regarde si l'**ID** existe déjà en production.
+    *   **Si OUI** ➔ Il met à jour l'élément (`UPDATE`).
+    *   **Si NON** ➔ Il crée l'élément avec le même ID (`CREATE`).
+4.  **Ordre des Dépendances** : Le script traite d'abord les tables "parents" (ex: Catégories) avant les tables "enfants" (ex: Sermons) pour éviter les erreurs de clés étrangères.
+
+### 3. Gestion de la Pagination (DRF) dans le Frontend
+Une erreur fréquente en production est le changement de structure des données dû à la **pagination**.
+
+- **En local** : L'API peut renvoyer une liste directe `[...]`.
+- **En production** : L'API renvoie souvent un objet `{ "results": [...] }`.
+
+**Astuce réutilisable** : Toujours utiliser cette ligne pour récupérer vos données dans le frontend :
+```javascript
+const items = response.data.results || response.data;
+// Ensuite, vérifiez que c'est bien une liste avant de 'mapper' :
+const safeItems = Array.isArray(items) ? items : [];
+```
+Cela garantit que votre code `.map()` ou `.filter()` ne plantera jamais, quel que soit le mode (paginé ou non).
+
+### 4. Pourquoi c'est mieux que `dumpdata` ?
+- **Pas d'écrasement total** : Contrairement à `loaddata`, ce script ne supprime rien en production. Il fusionne les données.
+- **Sécurité** : Si une erreur survient au milieu, la transaction `transaction.atomic` annule tout pour éviter une base de données corrompue.
+- **Liberté** : Vous pouvez modifier un texte en local et l'envoyer en production en 2 secondes sans toucher au code.
+
+---
 © 2026 Diocèse de Makamba - Église Anglicane du Burundi.

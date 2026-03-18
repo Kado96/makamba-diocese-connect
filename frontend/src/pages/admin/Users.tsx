@@ -78,7 +78,9 @@ const UsersManagement = () => {
         try {
             setLoading(true);
             const response = await api.get("/api/accounts/manage-users/");
-            setUsers(response.data);
+            // Gérer la pagination DRF (results) ou le format simple
+            const data = response.data.results || response.data;
+            setUsers(Array.isArray(data) ? data : []);
         } catch (error) {
             toast({
                 title: t('error', "Erreur"),
