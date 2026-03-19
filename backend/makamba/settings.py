@@ -186,11 +186,13 @@ if USE_S3_STORAGE:
     # Construction de l'URL publique pour Supabase Storage (Object Storage)
     # L'ID du projet est la partie avant '.storage.supabase.co' dans Endpoint URL
     PROJECT_ID = AWS_S3_ENDPOINT_URL.split('//')[1].split('.')[0]
-    # Ajout du sous-dossier 'media/' car le contenu a été uploadé dans un dossier nommé media
-    MEDIA_URL = f"https://{PROJECT_ID}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/media/"
     
-    # On désactive la gestion automatique des URLs par storages pour garder notre MEDIA_URL personnalisée
-    AWS_S3_CUSTOM_DOMAIN = None
+    # On définit le domaine personnalisé pour pointer vers l'URL publique Supabase
+    # Cela inclut le bucket ET le dossier intermédiaire 'media/'
+    AWS_S3_CUSTOM_DOMAIN = f"{PROJECT_ID}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/media"
+    
+    # Harmonisation de MEDIA_URL
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
     AWS_S3_FILE_OVERWRITE = False
 else:
     DEFAULT_FILE_STORAGE = 'api.utils.storage.CleanFileSystemStorage'
