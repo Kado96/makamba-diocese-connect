@@ -183,8 +183,14 @@ if USE_S3_STORAGE:
     
     DEFAULT_FILE_STORAGE = 'api.utils.storage.CleanS3Boto3Storage'
     
-    # Note : Sur Supabase, l'URL publique ressemble à [Endpoint]/[BucketName]/filename
-    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
+    # Construction de l'URL publique pour Supabase Storage (Object Storage)
+    # L'ID du projet est la partie avant '.storage.supabase.co' dans Endpoint URL
+    PROJECT_ID = AWS_S3_ENDPOINT_URL.split('//')[1].split('.')[0]
+    MEDIA_URL = f"https://{PROJECT_ID}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/"
+    
+    # On désactive la gestion automatique des URLs par storages pour garder notre MEDIA_URL personnalisée
+    AWS_S3_CUSTOM_DOMAIN = None
+    AWS_S3_FILE_OVERWRITE = False
 else:
     DEFAULT_FILE_STORAGE = 'api.utils.storage.CleanFileSystemStorage'
     MEDIA_URL = "/api/media/"
