@@ -174,17 +174,19 @@ if USE_S3_STORAGE:
     AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', 'media')
     AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')
-    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'eu-west-1')
+    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
+    AWS_S3_SIGNATURE_VERSION = os.environ.get('AWS_S3_SIGNATURE_VERSION', 's3v4')
     
     AWS_S3_ADDRESSING_STYLE = os.environ.get('AWS_S3_ADDRESSING_STYLE', 'path')
-    AWS_DEFAULT_ACL = os.environ.get('AWS_DEFAULT_ACL', 'public-read')
+    AWS_DEFAULT_ACL = None if os.environ.get('AWS_DEFAULT_ACL') in [None, 'None'] else os.environ.get('AWS_DEFAULT_ACL')
     AWS_QUERYSTRING_AUTH = False
     
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    DEFAULT_FILE_STORAGE = 'api.utils.storage.CleanS3Boto3Storage'
     
     # Note : Sur Supabase, l'URL publique ressemble à [Endpoint]/[BucketName]/filename
     MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
 else:
+    DEFAULT_FILE_STORAGE = 'api.utils.storage.CleanFileSystemStorage'
     MEDIA_URL = "/api/media/"
     MEDIA_ROOT = BASE_DIR / "media"
 
