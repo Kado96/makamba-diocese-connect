@@ -173,16 +173,52 @@ export interface DiocesePresentation {
     [key: string]: any; // Allow dynamic access like [field_${safeLang}]
 }
 
+export interface MinistryPage {
+    id: number;
+    hero_image: string | null;
+    hero_image_display?: string | null;
+    hero_badge_fr: string;
+    hero_badge_rn?: string | null;
+    hero_badge_en?: string | null;
+    hero_badge_sw?: string | null;
+    hero_title_fr: string;
+    hero_title_rn?: string | null;
+    hero_title_en?: string | null;
+    hero_title_sw?: string | null;
+    hero_description_fr?: string | null;
+    hero_description_rn?: string | null;
+    hero_description_en?: string | null;
+    hero_description_sw?: string | null;
+    [key: string]: any;
+}
+
 export interface Ministry {
     id: number;
-    title: string;
-    mission: string;
+    title_fr: string;
+    title_rn?: string | null;
+    title_en?: string | null;
+    title_sw?: string | null;
+    mission_fr: string;
+    mission_rn?: string | null;
+    mission_en?: string | null;
+    mission_sw?: string | null;
     icon: string;
-    testimony_quote: string;
+    testimony_quote_fr?: string | null;
+    testimony_quote_rn?: string | null;
+    testimony_quote_en?: string | null;
+    testimony_quote_sw?: string | null;
     testimony_author: string;
     image?: string;
     image_display?: string;
-    activities: { id: number; title: string }[];
+    order: number;
+    activities: { 
+        id: number; 
+        title_fr: string;
+        title_rn?: string | null;
+        title_en?: string | null;
+        title_sw?: string | null;
+    }[];
+    [key: string]: any;
 }
 
 export interface TimelineEvent {

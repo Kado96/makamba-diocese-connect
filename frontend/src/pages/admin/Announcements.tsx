@@ -57,22 +57,15 @@ import { api } from "@/lib/api";
 const AdminAnnouncements = () => {
     const { t, i18n } = useTranslation();
     const queryClient = useQueryClient();
-    const [activeLang, setActiveLang] = useState("fr");
     const [searchTerm, setSearchTerm] = useState("");
     const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<any>(null);
 
-    const langs = [
-        { code: "fr", label: "🇫🇷 FR" },
-        { code: "rn", label: "🇧🇮 RN" },
-        { code: "en", label: "🇬🇧 EN" },
-        { code: "sw", label: "🇹🇿 SW" },
-    ];
-
+    // Fetch sans filtre de langue pour l'admin (pour voir tous les articles bilingues)
     const { data: announcements, isLoading } = useQuery({
-        queryKey: ["admin-announcements", activeLang],
+        queryKey: ["admin-announcements"],
         queryFn: async () => {
-            const response = await api.get(`/api/announcements/admin/?language=${activeLang}`);
+            const response = await api.get(`/api/announcements/admin/`);
             return response.data.results || response.data;
         }
     });
@@ -98,6 +91,17 @@ const AdminAnnouncements = () => {
             setEditingItem(null);
         },
         onError: () => toast.error(t('admin_save_error', "Erreur lors de l'enregistrement"))
+    });
+
+    const removeImageMutation = useMutation({
+        mutationFn: async ({ announcementId, imageId }: { announcementId: number; imageId: number }) => {
+            await api.post(`/api/announcements/admin/${announcementId}/remove-image/`, { image_id: imageId });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["admin-announcements"] });
+            toast.success(t('admin_photo_removed', "Photo supprimée de la galerie"));
+        },
+        onError: () => toast.error(t('admin_photo_remove_error', "Erreur lors de la suppression de la photo"))
     });
 
     const deleteMutation = useMutation({
@@ -130,11 +134,10 @@ const AdminAnnouncements = () => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
 
-        // Cleanup empty files and strings
         const cleanedFormData = new FormData();
         formData.forEach((value, key) => {
-            if (value instanceof File && value.size === 0) return;
-            if (value === "" || value === "null" || value === "undefined") return;
+            if (value instanceof File && (value as File).size === 0) return;
+            if (value === "" && !key.includes('title') && !key.includes('content')) return;
             cleanedFormData.append(key, value);
         });
 
@@ -142,8 +145,9 @@ const AdminAnnouncements = () => {
     };
 
     const filteredItems = (Array.isArray(announcements) ? announcements : (announcements?.results || [])).filter((item: any) =>
-        item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.content?.toLowerCase().includes(searchTerm.toLowerCase())
+        item.title_fr?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.title_en?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.content_fr?.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
 
     return (
@@ -158,17 +162,6 @@ const AdminAnnouncements = () => {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
-                            {langs.map((l) => (
-                                <button
-                                    key={l.code}
-                                    onClick={() => setActiveLang(l.code)}
-                                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeLang === l.code ? "bg-white text-orange-600 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-                                >
-                                    {l.label}
-                                </button>
-                            ))}
-                        </div>
                         <Dialog open={isAddDialogOpen || !!editingItem} onOpenChange={(open) => {
                             if (!open) {
                                 setIsAddDialogOpen(false);
@@ -180,43 +173,54 @@ const AdminAnnouncements = () => {
                                     <Plus className="h-5 w-5" /> {t('admin_add_item', "Ajouter")}
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="sm:max-w-[500px] rounded-3xl bg-white/95 backdrop-blur-xl max-h-[90vh] overflow-y-auto custom-scrollbar">
-                                <DialogHeader>
+                            <DialogContent className="sm:max-w-[700px] rounded-3xl bg-white/95 backdrop-blur-xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+                                <DialogHeader className="mb-6">
                                     <DialogTitle className="text-2xl font-heading font-bold text-slate-900">
                                         {editingItem ? t('admin_edit_item', "Modifier l'annonce") : t('admin_new_item', "Ajouter une annonce")}
                                     </DialogTitle>
                                     <DialogDescription className="text-slate-500">
-                                        {t('admin_fill_info', "Remplissez les détails ci-dessous pour publier ce contenu.")}
+                                        {t('admin_fill_info_bilingual', "Saisissez les informations en français et en anglais.")}
                                     </DialogDescription>
                                 </DialogHeader>
-                                <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-                                    <div className="space-y-2">
-                                        <label htmlFor="announcement-title" className="text-sm font-bold text-slate-700">{t('admin_title_label', 'Titre de l\'article')}</label>
-                                        <Input id="announcement-title" name="title" defaultValue={editingItem?.title} required placeholder={t('admin_title_placeholder', "Ex: Célébration des 40 ans...")} className="rounded-xl h-12 border-slate-200 focus:ring-orange-500" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between mb-1">
-                                            <label htmlFor="announcement-content" className="text-sm font-bold text-slate-700">{t('admin_content_label', 'Contenu de l\'article (Long)')}</label>
-                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t('admin_multiline_support', 'Supporte le texte multi-lignes')}</span>
+                                <form onSubmit={handleSubmit} className="space-y-8 pt-4 pb-8">
+                                    {/* Langue Française */}
+                                    <div className="space-y-5 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <Badge variant="outline" className="bg-white text-slate-700 font-bold px-3 py-1">🇫🇷 {t('lang_fr', 'FRANÇAIS')}</Badge>
+                                        <div className="space-y-2">
+                                            <label htmlFor="title_fr" className="text-sm font-bold text-slate-700">{t('admin_title_label', 'Titre')}</label>
+                                            <Input id="title_fr" name="title_fr" defaultValue={editingItem?.title_fr || editingItem?.title} required placeholder="Titre en français..." className="rounded-xl h-12 border-slate-200 focus:ring-orange-500" />
                                         </div>
-                                        <Textarea id="announcement-content" name="content" defaultValue={editingItem?.content} required placeholder={t('admin_content_placeholder', "Rédigez votre article ici...")} className="rounded-xl min-h-[300px] border-slate-200 focus:ring-orange-500 p-4 leading-relaxed font-body" />
+                                        <div className="space-y-2">
+                                            <label htmlFor="content_fr" className="text-sm font-bold text-slate-700">{t('admin_content_label', 'Contenu')}</label>
+                                            <Textarea id="content_fr" name="content_fr" defaultValue={editingItem?.content_fr || editingItem?.content} required placeholder="Contenu en français..." className="rounded-xl min-h-[150px] border-slate-200 focus:ring-orange-500 p-4 leading-relaxed font-body" />
+                                        </div>
+                                    </div>
+
+                                    {/* Langue Anglaise */}
+                                    <div className="space-y-5 p-6 bg-orange-50/30 rounded-2xl border border-orange-100">
+                                        <Badge variant="outline" className="bg-white text-orange-700 font-bold px-3 py-1">🇬🇧 {t('lang_en', 'ENGLISH')}</Badge>
+                                        <div className="space-y-2">
+                                            <label htmlFor="title_en" className="text-sm font-bold text-slate-700">{t('admin_title_label_en', 'Title (EN)')}</label>
+                                            <Input id="title_en" name="title_en" defaultValue={editingItem?.title_en} placeholder="English title..." className="rounded-xl h-12 border-slate-200 focus:ring-orange-500" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="content_en" className="text-sm font-bold text-slate-700">{t('admin_content_label_en', 'Content (EN)')}</label>
+                                            <Textarea id="content_en" name="content_en" defaultValue={editingItem?.content_en} placeholder="English content..." className="rounded-xl min-h-[150px] border-slate-200 focus:ring-orange-500 p-4 leading-relaxed font-body" />
+                                        </div>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label htmlFor="announcement-category" className="text-sm font-bold text-slate-700">{t('admin_category_label', 'Catégorie')}</label>
-                                            <select id="announcement-category" name="category" defaultValue={editingItem?.category || "nouvelles"} className="flex h-12 w-full rounded-xl border border-slate-200 bg-background px-3 py-2 text-sm focus:ring-orange-500">
+                                            <label htmlFor="category" className="text-sm font-bold text-slate-700">{t('admin_category_label', 'Catégorie')}</label>
+                                            <select id="category" name="category" defaultValue={editingItem?.category || "nouvelles"} className="flex h-12 w-full rounded-xl border border-slate-200 bg-background px-3 py-2 text-sm focus:ring-orange-500">
                                                 <option value="temoignages">{t('cat_temoignages', 'Témoignages')}</option>
                                                 <option value="evenements">{t('cat_evenements', 'Événements')}</option>
                                                 <option value="nouvelles">{t('cat_nouvelles', 'Nouvelles')}</option>
                                             </select>
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="announcement-language" className="text-sm font-bold text-slate-700">{t('admin_lang_label', 'Langue')}</label>
-                                            <select id="announcement-language" name="language" defaultValue={editingItem?.language || "fr"} className="flex h-12 w-full rounded-xl border border-slate-200 bg-background px-3 py-2 text-sm focus:ring-orange-500">
-                                                <option value="fr">{t('lang_fr', 'Français')}</option>
-                                                <option value="en">{t('lang_en', 'English')}</option>
-                                            </select>
+                                            <label htmlFor="event_date" className="text-sm font-bold text-slate-700">{t('admin_date_label', 'Date de l\'événement')}</label>
+                                            <Input id="event_date" name="event_date" type="date" defaultValue={editingItem?.event_date} className="rounded-xl h-12 border-slate-200 focus:ring-orange-500" />
                                         </div>
                                     </div>
 
@@ -228,44 +232,42 @@ const AdminAnnouncements = () => {
                                             {editingItem?.image_display && (
                                                 <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-200 shadow-sm">
                                                     <img src={editingItem.image_display} alt={t('admin_current_cover', "Couverture actuelle")} className="object-cover w-full h-full" />
-                                                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                                        <span className="text-white text-xs font-bold bg-black/50 px-3 py-1.5 rounded-full">{t('admin_edit_image_label', "Modifier l'image")}</span>
-                                                    </div>
                                                 </div>
                                             )}
-                                            <Input id="announcement-image" name="image" type="file" accept="image/*" className="rounded-xl h-11 border-dashed border-2 hover:border-orange-300 transition-colors" />
+                                            <Input id="image" name="image" type="file" accept="image/*" className="rounded-xl h-11 border-dashed border-2 hover:border-orange-300 transition-colors" />
                                         </div>
                                     </div>
 
-                                    {/* 🖼️ Gestion de la Galerie (Lecture seule dans ce formulaire simple, modification via Admin Django pour l'instant ou multi-upload futur) */}
-                                    <div className="space-y-4">
+                                    {/* 🖼️ Gestion de la Galerie (Multi-upload) */}
+                                    <div className="space-y-4 p-6 bg-indigo-50/30 rounded-2xl border border-indigo-100">
                                         <div className="flex items-center justify-between">
                                             <h4 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                                                <PlusCircle className="h-4 w-4 text-indigo-500" /> {t('admin_gallery_label', 'Galerie d\'images')}
+                                                <PlusCircle className="h-4 w-4 text-indigo-500" /> {t('admin_gallery_label', 'Galerie d\'images (Plusieurs photos)')}
                                             </h4>
                                             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{editingItem?.gallery?.length || 0} {t('admin_photos_count', 'photos')}</span>
                                         </div>
 
-                                        {editingItem?.gallery && editingItem.gallery.length > 0 ? (
-                                            <div className="grid grid-cols-4 gap-2">
+                                        {editingItem?.gallery && editingItem.gallery.length > 0 && (
+                                            <div className="grid grid-cols-4 gap-3 mb-4">
                                                 {editingItem.gallery.map((img: any) => (
-                                                    <div key={img.id} className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 group">
+                                                    <div key={img.id} className="relative aspect-square rounded-xl overflow-hidden border border-slate-200 shadow-sm group">
                                                         <img src={img.image_url} alt="" className="w-full h-full object-cover" />
-                                                        <div className="absolute inset-0 bg-red-500/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                                                            <Trash2 className="h-4 w-4 text-white" />
-                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => { if (window.confirm(t('admin_confirm_photo_delete', "Supprimer cette photo ?"))) removeImageMutation.mutate({ announcementId: editingItem.id, imageId: img.id }); }}
+                                                            className="absolute inset-0 bg-red-500/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <Trash2 className="h-5 w-5 text-white" />
+                                                        </button>
                                                     </div>
                                                 ))}
-                                                <div className="aspect-square rounded-lg border-2 border-dashed border-slate-200 flex items-center justify-center hover:border-orange-300 hover:bg-orange-50 transition-all cursor-pointer">
-                                                    <Plus className="h-6 w-6 text-slate-300" />
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="p-8 text-center border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/50">
-                                                <ImageIcon className="h-8 w-8 text-slate-200 mx-auto mb-2" />
-                                                <p className="text-xs text-slate-400 font-medium">{t('admin_gallery_empty', "Aucune photo dans la galerie.")}<br />{t('admin_gallery_advanced_tip', "Utilisez l'interface avancée pour ajouter des photos.")}</p>
                                             </div>
                                         )}
+                                        
+                                        <div className="space-y-2">
+                                            <label htmlFor="gallery_images" className="text-xs font-bold text-slate-500">{t('admin_add_more_photos', 'Ajouter des photos à la galerie')}</label>
+                                            <Input id="gallery_images" name="gallery_images" type="file" accept="image/*" multiple className="rounded-xl h-11 border-dashed border-2 hover:border-indigo-300 transition-colors" />
+                                        </div>
                                     </div>
 
                                     <div className="flex items-center gap-6 p-4 bg-orange-50/50 rounded-2xl border border-orange-100">
@@ -273,18 +275,18 @@ const AdminAnnouncements = () => {
                                             <p className="text-sm font-bold text-orange-900">{t('admin_visibility_label', 'Visibilité')}</p>
                                             <p className="text-xs text-orange-700/70">{t('admin_visibility_tip', "L'article sera visible dès la publication.")}</p>
                                         </div>
-                                        <label htmlFor="announcement-is-active" className="relative inline-flex items-center cursor-pointer ml-auto">
-                                            <input id="announcement-is-active" type="checkbox" name="is_active" defaultChecked={editingItem?.is_active ?? true} className="sr-only peer" />
+                                        <label htmlFor="is_active" className="relative inline-flex items-center cursor-pointer ml-auto">
+                                            <input id="is_active" type="checkbox" name="is_active" defaultChecked={editingItem?.is_active ?? true} className="sr-only peer" />
                                             <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
                                         </label>
                                     </div>
 
-                                    <DialogFooter className="sticky bottom-0 bg-white pt-4 border-t border-slate-100 -mx-6 px-6 pb-2">
-                                        <Button type="submit" disabled={saveMutation.isPending} className="w-full bg-orange-500 hover:bg-orange-600 h-14 rounded-2xl text-white font-bold text-lg shadow-xl shadow-orange-500/30 transition-all active:scale-[0.98]">
+                                    <div className="sticky bottom-4 bg-white/90 backdrop-blur-sm p-4 rounded-3xl border border-slate-100 shadow-2xl z-50 mt-10">
+                                        <Button type="submit" disabled={saveMutation.isPending} className="w-full bg-orange-500 hover:bg-orange-600 h-14 rounded-[1.25rem] text-white font-bold text-lg shadow-xl shadow-orange-500/30 transition-all active:scale-[0.98]">
                                             {saveMutation.isPending ? <Loader2 className="h-6 w-6 animate-spin" /> : <CheckCircle className="h-6 w-6 mr-3" />}
                                             {editingItem ? t('admin_update_article', "Mettre à jour l'article") : t('admin_publish_article', "Publier l'article maintenant")}
                                         </Button>
-                                    </DialogFooter>
+                                    </div>
                                 </form>
                             </DialogContent>
                         </Dialog>
@@ -311,7 +313,7 @@ const AdminAnnouncements = () => {
                         </div>
                     </CardHeader>
                     <CardContent className="p-0">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-8">
                             {isLoading ? (
                                 <div className="col-span-full h-64 flex flex-col items-center justify-center gap-3">
                                     <Loader2 className="h-8 w-8 text-orange-500 animate-spin" />
@@ -355,7 +357,7 @@ const AdminAnnouncements = () => {
                                             {/* Image Section */}
                                             <div className="relative aspect-video overflow-hidden bg-slate-100">
                                                 {item.image_display ? (
-                                                    <img src={item.image_display} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                                                    <img src={item.image_display} alt={item.title_fr} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-orange-200">
                                                         <Megaphone className="h-12 w-12" />
@@ -365,9 +367,10 @@ const AdminAnnouncements = () => {
                                                     <Badge className="bg-orange-500/90 backdrop-blur-md text-white border-none px-3 py-1 text-[10px] font-bold uppercase tracking-wider">
                                                         {item.category_display || item.category}
                                                     </Badge>
-                                                    <Badge variant="outline" className="bg-white/90 backdrop-blur-md text-slate-700 border-none px-3 py-1 text-[10px] font-bold uppercase tracking-wider">
-                                                        {item.language === 'fr' ? t('lang_fr_short', 'FR') : item.language === 'rn' ? t('lang_rn_short', 'RN') : item.language === 'en' ? t('lang_en_short', 'EN') : t('lang_sw_short', 'SW')}
-                                                    </Badge>
+                                                    <div className="flex gap-1 overflow-hidden rounded-full border border-white/20">
+                                                        {item.title_fr && <div className="h-5 w-5 flex items-center justify-center text-[10px] bg-white text-slate-800 font-bold border-r border-slate-200">FR</div>}
+                                                        {item.title_en && <div className="h-5 w-5 flex items-center justify-center text-[10px] bg-orange-100 text-orange-800 font-bold">EN</div>}
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -375,7 +378,7 @@ const AdminAnnouncements = () => {
                                             <div className="p-8 flex-grow flex flex-col">
                                                 <div className="flex items-center gap-2 mb-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                                                     <Calendar className="h-3 w-3" />
-                                                    {new Date(item.created_at).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                                    {new Date(item.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                                                     <div className="ml-auto flex items-center gap-1.5">
                                                         <div className={`w-1.5 h-1.5 rounded-full ${item.is_active ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
                                                         <span className={item.is_active ? 'text-emerald-600' : 'text-slate-400'}>
@@ -384,21 +387,21 @@ const AdminAnnouncements = () => {
                                                     </div>
                                                 </div>
                                                 <h3 className="text-xl font-heading font-bold text-slate-900 mb-3 group-hover:text-orange-600 transition-colors line-clamp-1">
-                                                    {item.title}
+                                                    {item.title_fr || item.title}
                                                 </h3>
-                                                <p className="text-sm text-slate-500 leading-relaxed font-body line-clamp-3 mb-6">
-                                                    {item.content}
+                                                <p className="text-sm text-slate-500 leading-relaxed font-body line-clamp-2 mb-4">
+                                                    {item.content_fr || item.content}
                                                 </p>
 
-                                                <div className="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
-                                                    <div className="flex -space-x-2">
+                                                <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
+                                                    <div className="flex -space-x-1.5">
                                                         {item.gallery?.map((img: any, i: number) => i < 3 && (
-                                                            <div key={img.id} className="w-8 h-8 rounded-full border-2 border-white overflow-hidden shadow-sm">
+                                                            <div key={img.id} className="w-7 h-7 rounded-full border-2 border-white overflow-hidden shadow-sm">
                                                                 <img src={img.image_url} className="w-full h-full object-cover" alt="" />
                                                             </div>
                                                         ))}
                                                         {item.gallery?.length > 3 && (
-                                                            <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500 shadow-sm">
+                                                            <div className="w-7 h-7 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-500 shadow-sm">
                                                                 +{item.gallery.length - 3}
                                                             </div>
                                                         )}
@@ -407,7 +410,7 @@ const AdminAnnouncements = () => {
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => toggleStatusMutation.mutate({ id: item.id, is_active: !item.is_active })}
-                                                        className={`text-xs font-bold uppercase tracking-widest ${item.is_active ? 'text-slate-400 hover:text-orange-600' : 'text-orange-500 hover:text-orange-600'}`}
+                                                        className={`h-7 px-3 text-[9px] font-bold uppercase tracking-widest rounded-full ${item.is_active ? 'text-slate-400 hover:text-orange-600 hover:bg-slate-50' : 'text-orange-500 hover:text-orange-600 hover:bg-orange-50'}`}
                                                     >
                                                         {item.is_active ? t('admin_deactivate', 'Désactiver') : t('admin_activate', 'Activer')}
                                                     </Button>

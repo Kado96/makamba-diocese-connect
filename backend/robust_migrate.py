@@ -9,7 +9,7 @@ backend_dir = os.path.dirname(os.path.abspath(__file__))
 if backend_dir not in sys.path:
     sys.path.insert(0, backend_dir)
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shalomministry.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'makamba.settings')
 
 try:
     django.setup()
@@ -40,7 +40,7 @@ try:
         try:
             from api.settings.models import SiteSettings
             from api.ministries.models import Ministry
-            f.write(f"SiteSettings fields: {[f.name for f in SiteSettings._meta.fields if '_fr' in f.name][:5]}...\n")
+            f.write(f"SiteSettings fields: {list([f.name for f in SiteSettings._meta.fields if '_fr' in f.name])[:5]}...\n")
             f.write(f"Ministry count: {Ministry.objects.count()}\n")
         except Exception as e:
             f.write(f"ERROR: {str(e)}")

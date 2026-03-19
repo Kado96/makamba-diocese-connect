@@ -89,17 +89,34 @@ class MakambaSync:
             sys.exit(1)
 
     def _prepare_data(self, instance):
-        """Prépare les données en gérant les relations et excluant les fichiers"""
+        """Prépare les données en gérant les relations et l'upload vers le storage de prod"""
         data = {}
         for field in instance._meta.fields:
             if field.name == 'id': continue
             
-            # On ne synchronise pas les fichiers binaires eux-mêmes, seulement les noms/chemins
-            # Le serveur de prod s'attend à ce que les fichiers soient déjà là ou via URL
             val = getattr(instance, field.name)
             
             if field.is_relation and val:
                 data[f"{field.name}_id"] = val.id
+            elif hasattr(val, 'url'):  # C'est un FileField / ImageField
+                if val:
+                    # ✅ SÉCURITÉ PRODUCTION (astuce.md point 114)
+                    # Si on est en local et qu'on synchronise vers la prod qui utilise S3
+                    if settings.USE_S3_STORAGE and not val.storage.__class__.__name__.startswith('CleanS3'):
+                        try:
+                            # On essaye d'uploader le fichier local vers S3 si possible
+                            # via le système de stockage par défaut (qui devrait être S3 en config prod)
+                            from django.core.files.storage import default_storage
+                            if not default_storage.exists(val.name):
+                                logger.info(f"    [FILE] Uploading {val.name} to Production Storage...")
+                                with val.open('rb') as f:
+                                    default_storage.save(val.name, f)
+                        except Exception as e:
+                            logger.warning(f"    ⚠️ Impossible d'uploader le fichier {val.name}: {e}")
+                    
+                    data[field.name] = val.name
+                else:
+                    data[field.name] = None
             else:
                 data[field.name] = val
         return data

@@ -76,7 +76,7 @@ class DiocesePresentationViewSet(viewsets.GenericViewSet):
 
         if request.method == 'GET':
             serializer = self.get_serializer(obj)
-            return Response(serializer.data)
+            return Response([serializer.data]) # 🔥 TOUJOURS UNE LISTE
         
         elif request.method in ['PUT', 'PATCH']:
             if not request.user.is_authenticated:
@@ -84,6 +84,6 @@ class DiocesePresentationViewSet(viewsets.GenericViewSet):
             serializer = self.get_serializer(obj, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data)
+                return Response([serializer.data]) # 🔥 TOUJOURS UNE LISTE
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

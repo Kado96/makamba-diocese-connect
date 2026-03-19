@@ -11,6 +11,7 @@ import type {
     SiteSettings,
     Parish,
     Ministry,
+    MinistryPage,
     MissionAxe,
     VisionValue,
     TimelineEvent,
@@ -173,10 +174,14 @@ export const fetchParishes = async (): Promise<Parish[] | null> => {
 };
 
 /** Récupère les ministères */
-export const fetchMinistries = async (lang?: string): Promise<Ministry[] | null> => {
-    const language = normalizeLang(lang);
-    const data = await apiFetch<PaginatedResponse<Ministry>>(`/api/ministries/?language=${language}`);
+export const fetchMinistries = async (): Promise<Ministry[] | null> => {
+    const data = await apiFetch<PaginatedResponse<Ministry>>(`/api/ministries/`);
     return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
+};
+
+/** Récupère le contenu de la page ministères (Hero, etc.) */
+export const fetchMinistryPage = async (): Promise<MinistryPage | null> => {
+    return apiFetch<MinistryPage>(`/api/ministries/page/current/`);
 };
 
 // ==============================================
@@ -211,10 +216,11 @@ export const fetchTeamMembers = async (lang?: string): Promise<TeamMember[] | nu
     return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 };
 
-/** Récupère la présentation complète du diocèse (Singleton) */
-export const fetchDiocesePresentation = async (lang?: string): Promise<DiocesePresentation | null> => {
+/** Récupère la présentation complète du diocèse (Singleton sous format Liste) */
+export const fetchDiocesePresentation = async (lang?: string): Promise<DiocesePresentation[] | null> => {
     const language = normalizeLang(lang);
-    return await apiFetch<DiocesePresentation>(`/api/pages/diocese-presentation/current/?language=${language}`);
+    const data = await apiFetch<PaginatedResponse<DiocesePresentation>>(`/api/pages/diocese-presentation/current/?language=${language}`);
+    return (Array.isArray(data) ? (data as any) : data?.results) ?? null;
 };
 
 

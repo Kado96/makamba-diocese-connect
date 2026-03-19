@@ -20,11 +20,17 @@ class Announcement(models.Model):
         ('sw', 'Kiswahili'),
     ]
 
-    title = models.CharField(max_length=255)
-    content = models.TextField()
+    title_fr = models.CharField(max_length=255, verbose_name="Titre (FR)", default="")
+    title_en = models.CharField(max_length=255, verbose_name="Titre (EN)", default="", blank=True)
+    content_fr = models.TextField(verbose_name="Contenu (FR)", default="")
+    content_en = models.TextField(verbose_name="Contenu (EN)", default="", blank=True)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='nouvelles')
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='normale')
-    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='fr')
+    
+    # Obsolète - sera supprimé après migration
+    title = models.CharField(max_length=255, null=True, blank=True)
+    content = models.TextField(null=True, blank=True)
+    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='fr', null=True, blank=True)
     event_date = models.DateField(null=True, blank=True)
     image = models.ImageField(upload_to='announcements/', blank=True, null=True, verbose_name="Image à la une")
     is_active = models.BooleanField(default=True)

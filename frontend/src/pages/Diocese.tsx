@@ -35,13 +35,13 @@ const Diocese = () => {
   const safeLang = i18n.language?.split("-")[0] || "fr";
 
   const { data: settings, isLoading: loadingSettings } = useSiteSettings();
-  const { data: presentation, isLoading: loadingPresentation } = useDiocesePresentation();
+  const { data: presentationList, isLoading: loadingPresentation } = useDiocesePresentation();
+  const presentation = presentationList?.[0];
   const { data: apiTimeline, isLoading: loadingTimeline } = useTimeline();
   const { data: apiTeam, isLoading: loadingTeam } = useTeamMembers();
-  const { data: apiVision, isLoading: loadingVision } = useVisionValues();
   const { data: apiAxes, isLoading: loadingAxes } = useMissionAxes();
 
-  const isLoading = loadingSettings || loadingPresentation || loadingTimeline || loadingTeam || loadingVision || loadingAxes;
+  const isLoading = loadingSettings || loadingPresentation || loadingTimeline || loadingTeam || loadingAxes;
 
   // Ordering Data
   // Ordering & Filtering Data by Language
@@ -53,13 +53,7 @@ const Diocese = () => {
     ? apiTeam.filter(item => item.language === safeLang).sort((a, b) => a.order - b.order) 
     : [];
     
-  const visionValues = apiVision 
-    ? apiVision.filter(item => item.language === safeLang).sort((a, b) => a.order - b.order) 
-    : [];
-    
-  const missionAxes = apiAxes 
-    ? apiAxes.filter(item => item.language === safeLang).sort((a, b) => a.order - b.order) 
-    : [];
+
 
   if (isLoading) {
     return (
@@ -101,7 +95,7 @@ const Diocese = () => {
               {t('about_badge', 'À Propos de Nous')}
             </span>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white font-heading mb-6 tracking-tight drop-shadow-xl leading-tight">
-              {t('the_diocese_title_1', 'Le')} <span className="text-transparent bg-clip-text bg-gradient-to-br from-emerald-300 to-green-100 italic">{t('the_diocese_title_2', 'Diocèse')}</span>
+              {presentation?.[`hero_title_${safeLang}`] || t('diocese_hero_title', 'Le Diocèse')}
             </h1>
             <p className="text-lg md:text-2xl text-white/80 max-w-3xl mx-auto font-light leading-relaxed drop-shadow-md">
               {presentation?.[`hero_subtitle_${safeLang}`] || t('diocese_hero_desc')}
@@ -119,16 +113,20 @@ const Diocese = () => {
             </motion.a>
           </motion.div>
         </div>
+        {/* Background Hero Title */}
+        <h1 className="text-6xl md:text-8xl lg:text-9xl font-heading font-black text-white/10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none tracking-tighter whitespace-nowrap uppercase">
+          {presentation?.[`hero_title_${safeLang}`] || t('diocese_hero_title', 'Le Diocèse')}
+        </h1>
       </div>
 
       {/* STICKY NAV BAR (Optional Sub-Menu style) */}
       <div className="w-full bg-white border-b border-slate-100 shadow-sm sticky top-[72px] z-30 hidden md:block">
         <div className="container mx-auto px-4">
           <ul className="flex justify-center gap-12 font-heading font-semibold text-slate-500 uppercase tracking-widest text-sm">
-            <li><a href="#historique" className="inline-block py-4 hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">{t('diocese_history', 'Historique')}</a></li>
-            <li><a href="#bishop" className="inline-block py-4 hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">{t('diocese_bishop_message', "L'Évêque")}</a></li>
-            <li><a href="#vision" className="inline-block py-4 hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">{t('vision_title', 'Vision & Mission')}</a></li>
-            <li><a href="#team" className="inline-block py-4 hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">{t('diocese_team', "L'Équipe")}</a></li>
+            <li><a href="#historique" className="inline-block py-4 hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">{presentation?.[`nav_history_${safeLang}`] || t('diocese_history', 'Historique')}</a></li>
+            <li><a href="#bishop" className="inline-block py-4 hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">{presentation?.[`nav_bishop_${safeLang}`] || t('diocese_bishop_message', "L'Évêque")}</a></li>
+            <li><a href="#vision" className="inline-block py-4 hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">{presentation?.[`nav_vision_${safeLang}`] || t('vision_title', 'Vision & Mission')}</a></li>
+            <li><a href="#team" className="inline-block py-4 hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary">{presentation?.[`nav_team_${safeLang}`] || t('diocese_team', "L'Équipe")}</a></li>
           </ul>
         </div>
       </div>
@@ -147,8 +145,15 @@ const Diocese = () => {
               >
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-1.5 bg-primary rounded-full"></div>
-                  <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 tracking-tight leading-tight">{t('origin_org_title', 'Notre Origine &')}<br />{t('organization_title', 'Organisation')}</h2>
+                  <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 tracking-tight leading-tight">
+                    {presentation?.[`organization_title_${safeLang}`] || t('origin_org_title', 'Notre Origine & Organisation')}
+                  </h2>
                 </div>
+                {presentation?.[`organization_subtitle_${safeLang}`] && (
+                  <p className="text-lg text-slate-500 font-medium border-l-4 border-primary pl-6 py-2">
+                     {presentation?.[`organization_subtitle_${safeLang}`]}
+                  </p>
+                )}
 
                 {(presentation?.[`history_text_${safeLang}`]) && (
                   <div className="space-y-6">
@@ -188,7 +193,7 @@ const Diocese = () => {
                 className="relative"
               >
                 {/* Historique Chronologique (Timeline) */}
-                <h3 className="text-2xl font-heading font-bold mb-8 text-slate-800 border-b pb-4">{t('major_chronology', 'Chronologie Majeure')}</h3>
+                <h3 className="text-2xl font-heading font-bold mb-8 text-slate-800 border-b pb-4">{presentation?.[`history_title_${safeLang}`] || t('major_chronology', 'Chronologie Majeure')}</h3>
                 <div className="space-y-12 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
                   {timeline.length > 0 ? timeline.map((event, index) => (
                     <div key={index} className="relative flex items-start justify-between md:justify-normal md:odd:flex-row-reverse group md:mx-auto">
@@ -199,8 +204,8 @@ const Diocese = () => {
 
                       {/* Card */}
                       <div className="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] bg-white p-6 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-slate-50 hover:shadow-xl transition-all">
-                        <span className="font-heading font-bold text-primary tracking-wider uppercase text-sm mb-2 block">{event.year}</span>
-                        <h4 className="font-bold text-slate-800 text-lg mb-3">{event.title}</h4>
+                        {event.year && <span className="font-heading font-bold text-primary tracking-wider uppercase text-sm mb-2 block">{event.year}</span>}
+                        {event.title && <h4 className="font-bold text-slate-800 text-lg mb-3">{event.title}</h4>}
 
                         {event.image_display && (
                           <div className="w-full h-32 mb-4 rounded-xl overflow-hidden bg-slate-100">
@@ -260,7 +265,7 @@ const Diocese = () => {
                       {presentation.bishop_name || "Rt. Rev. Samuel Nduwayo"}
                     </h3>
                     <p className="text-slate-400 font-medium uppercase tracking-widest text-sm mt-2">
-                      {t('bishop_of_diocese', 'Évêque du Diocèse')}
+                      {presentation?.[`bishop_title_${safeLang}`] || t('bishop_of_diocese', 'Évêque du Diocèse')}
                     </p>
                   </div>
                 </div>
@@ -270,85 +275,94 @@ const Diocese = () => {
         )}
 
 
-        {/* SECTION: VISION & VALEURS */}
+        {/* SECTION: BLOCS ÉDITORIAUX (Vision, Mission, Valeurs) */}
         <section id="vision" className="py-24 bg-[#FDFDFD]">
-          <div className="container mx-auto px-6 max-w-6xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
+          <div className="container mx-auto px-6 max-w-6xl space-y-32">
+            
+            {/* BLOC 1: VISION (Image à Droite) */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-16"
+              className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center"
             >
-              <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-6">{presentation?.[`vision_title_${safeLang}`] || t('vision_title')}</h2>
-              <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">{presentation?.[`vision_description_${safeLang}`] || t('vision_subtitle_default')}</p>
-
+              <div className="flex-1 space-y-8">
+                <div className="space-y-4">
+                  <div className="w-16 h-1 bg-red-600"></div>
+                  <h6 className="text-red-600 font-bold uppercase tracking-widest text-xs">
+                    {presentation?.[`vision_badge_${safeLang}`] || t('vision_badge_default', 'NOTRE VISION')}
+                  </h6>
+                  <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 leading-tight">
+                    {presentation?.[`vision_title_${safeLang}`] || t('vision_title')}
+                  </h2>
+                </div>
+                <div className="text-lg text-slate-600 leading-relaxed whitespace-pre-line text-justify">
+                  {presentation?.[`vision_description_${safeLang}`]}
+                </div>
+              </div>
+              {presentation?.vision_image_display && (
+                <div className="w-full lg:w-[450px] aspect-[4/5] rounded-xl overflow-hidden shadow-2xl skew-y-1">
+                  <img src={presentation.vision_image_display} alt="Vision" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+                </div>
+              )}
             </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-              {/* Values Grid */}
-              <div>
-                <h3 className="text-3xl font-heading font-bold mb-10 text-slate-800 flex items-center gap-3">
-                  <Target className="text-primary h-8 w-8" /> {t('our_values', 'Nos Valeurs')}
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {visionValues.length > 0 ? visionValues.map((val, idx) => (
-                    <motion.div
-                      key={idx}
-                      whileHover={{ y: -5 }}
-                      className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all overflow-hidden"
-                    >
-                      {val.image_display && (
-                        <div className="w-full h-32 -mt-6 -mx-6 mb-6 overflow-hidden">
-                          <img src={val.image_display} alt={val.title} className="w-full h-full object-cover" />
-                        </div>
-                      )}
-                      <div className="flex items-center gap-4 mb-4">
-                        {!val.image_display && (
-                          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                            {renderIcon(val.icon, { className: "h-6 w-6" })}
-                          </div>
-                        )}
-                        <h4 className="text-lg font-bold text-slate-900">{val.title}</h4>
-                      </div>
-                      <p className="text-slate-500 text-sm leading-relaxed">{val.description}</p>
-                    </motion.div>
-                  )) : (
-                    <p className="text-slate-400 italic">{t('no_values_configured', 'Aucune valeur configurée.')}</p>
-                  )}
+            {/* BLOC 2: MISSION (Image à Gauche) */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="flex flex-col-reverse lg:flex-row gap-12 lg:gap-20 items-center"
+            >
+              {presentation?.mission_image_display && (
+                <div className="w-full lg:w-[450px] aspect-[4/5] rounded-xl overflow-hidden shadow-2xl -skew-y-1">
+                  <img src={presentation.mission_image_display} alt="Mission" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
                 </div>
-              </div>
-
-              {/* Mission Axes list */}
-              <div className="bg-slate-50 rounded-3xl p-8 md:p-12 border border-slate-100">
-                <h3 className="text-3xl font-heading font-bold mb-10 text-slate-800 flex items-center gap-3">
-                  <Target className="text-violet-500 h-8 w-8" /> {t('mission_axes', 'Nos Axes Stratégiques')}
-                </h3>
+              )}
+              <div className="flex-1 space-y-8">
                 <div className="space-y-4">
-                  {missionAxes.length > 0 ? missionAxes.map((axe, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, x: 20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="flex flex-col gap-4 p-4 bg-white rounded-2xl shadow-sm"
-                    >
-                      {axe.image_display && (
-                        <div className="w-full h-40 rounded-xl overflow-hidden">
-                          <img src={axe.image_display} alt={axe.text} className="w-full h-full object-cover" />
-                        </div>
-                      )}
-                      <div className="flex items-start gap-4">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-violet-100 text-violet-600 font-bold font-heading shrink-0">
-                          {idx + 1}
-                        </div>
-                        <p className="text-slate-700 font-medium leading-relaxed pt-1">{axe.text}</p>
-                      </div>
-                    </motion.div>
-                  )) : (
-                    <p className="text-slate-400 italic">{t('no_axes_configured', 'Aucun axe configuré.')}</p>
-                  )}
+                  <div className="w-16 h-1 bg-violet-600"></div>
+                  <h6 className="text-violet-600 font-bold uppercase tracking-widest text-xs">
+                    {presentation?.[`mission_badge_${safeLang}`] || t('mission_badge_default', 'NOTRE MISSION')}
+                  </h6>
+                  <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 leading-tight">
+                    {presentation?.[`mission_title_${safeLang}`] || t('mission_title')}
+                  </h2>
+                </div>
+                <div className="text-lg text-slate-600 leading-relaxed whitespace-pre-line text-justify">
+                  {presentation?.[`mission_description_${safeLang}`]}
                 </div>
               </div>
+            </motion.div>
+
+            {/* BLOC 3: VALEURS (Image à Droite) */}
+            <div className="space-y-20">
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center"
+              >
+                <div className="flex-1 space-y-8">
+                  <div className="space-y-4">
+                    <div className="w-16 h-1 bg-emerald-600"></div>
+                    <h6 className="text-emerald-600 font-bold uppercase tracking-widest text-xs">
+                      {presentation?.[`values_badge_${safeLang}`] || t('values_badge_default', 'NOS VALEURS')}
+                    </h6>
+                    <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 leading-tight">
+                      {presentation?.[`values_title_${safeLang}`] || t('our_values')}
+                    </h2>
+                  </div>
+                  <div className="text-lg text-slate-600 leading-relaxed whitespace-pre-line text-justify">
+                    {presentation?.[`values_description_${safeLang}`]}
+                  </div>
+                </div>
+                {presentation?.values_image_display && (
+                  <div className="w-full lg:w-[450px] aspect-video lg:aspect-[4/5] rounded-xl overflow-hidden shadow-2xl skew-y-1">
+                    <img src={presentation.values_image_display} alt="Valeurs" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" />
+                  </div>
+                )}
+              </motion.div>
             </div>
           </div>
         </section>
@@ -363,9 +377,15 @@ const Diocese = () => {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <span className="text-primary font-bold tracking-widest uppercase text-sm mb-2 block">{t('leadership', 'Leadership')}</span>
-              <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-6">{t('diocese_team_title', "L'Équipe Diocésaine")}</h2>
-              <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">{t('team_description_default', 'Les responsables dévoués qui accompagnent chaque jour la vie, les ministères et les projets du diocèse.')}</p>
+              <span className="text-primary font-bold tracking-widest uppercase text-sm mb-2 block">
+                {presentation?.[`team_badge_${safeLang}`] || t('leadership')}
+              </span>
+              <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-6">
+                {presentation?.[`team_title_${safeLang}`] || t('diocese_team_title')}
+              </h2>
+              <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed whitespace-pre-line">
+                {presentation?.[`team_description_${safeLang}`] || t('team_description_default')}
+              </p>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">

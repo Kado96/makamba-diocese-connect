@@ -61,9 +61,7 @@ const AdminTestimonials = () => {
 
     const langs = [
         { code: "fr", label: t('lang_fr_short', 'FR') },
-        { code: "rn", label: t('lang_rn_short', 'RN') },
         { code: "en", label: t('lang_en_short', 'EN') },
-        { code: "sw", label: t('lang_sw_short', 'SW') },
     ];
 
     const { data: testimonials, isLoading } = useQuery({

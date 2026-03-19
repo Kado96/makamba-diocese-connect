@@ -6,7 +6,7 @@ Application complète pour la gestion et la communication du **Diocèse de Makam
 
 - **Backend** : Django REST Framework, PostgreSQL (**Supabase**) en production, SQLite en développement local.
 - **Frontend** : React, Vite, Tailwind CSS, TypeScript, Framer Motion (animations).
-- **Langues supportées** : Français (FR), Kirundi (RN), Anglais (EN), Kiswahili (SW).
+- **Langues supportées** : Français (FR), Anglais (EN) (Simplification Mars 2026).
 
 ---
 
@@ -119,7 +119,7 @@ Ce script est le "cerveau" de l'opération. Il gère la synchronisation de la ma
     *   ⛪ **Église** : Paroisses, Ministères et leurs activités.
     *   📖 **Enseignement** : Sermons et leurs catégories.
     *   📰 **Communication** : Annonces, Articles et Témoignages.
-    *   📄 **Contenu Web** : Timeline, Valeurs, Vision, Équipe et Présentation du Diocèse.
+    *   📄 **Contenu Web** : Timeline, Valeurs, Vision, Équipe et Présentation du Diocèse (**Désormais 100% dynamique : Hero, Nav, Badges inclus**).
 3.  **Vérification d'Existence** : Pour chaque élément :
     *   Il regarde si l'**ID** existe déjà en production.
     *   **Si OUI** ➔ Il met à jour l'élément (`UPDATE`).
@@ -241,6 +241,13 @@ AWS_S3_REGION_NAME=votre_region (ex: eu-central-1)
 - **Stabilité** : Vos photos ne disparaissent plus.
 - **Vitesse** : Les images sont servies par le réseau mondial de Supabase.
 - **Synchronisation** : Tout ce que vous uploadez en local apparaît immédiatement sur le site réel.
+
+---
+---
+
+## 📰 Système d'Actualités (Bilingue Native & Galeries)
+
+Le système de communication est désormais nativement bilingue (champs FR/EN sur un seul article) et supporte l'upload multiple d'images pour des galeries photo riches. Tout est géré dans une interface d'administration unifiée et ultra-rapide.
 
 ---
 © 2024-2026 Diocèse de Makamba - Église Anglicane du Burundi.

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { useTranslation } from "react-i18next";
 import ImageFieldWithPreview from "./ImageFieldWithPreview";
+import TimelineManager from "./TimelineManager";
 
 const DiocesePresentationTab = () => {
     const { t } = useTranslation();
@@ -48,9 +49,17 @@ const DiocesePresentationTab = () => {
         const cleanedFormData = new FormData();
 
         formData.forEach((value, key) => {
-            if (value instanceof File && value.size === 0) return;
-            if (value === "" || value === "null" || value === "undefined") return;
-            cleanedFormData.append(key, value);
+            if (key.startsWith('clear_')) return;
+            if (value instanceof File) {
+                if (value.size > 0) {
+                    cleanedFormData.append(key, value);
+                } else if (formData.get(`clear_${key}`) === 'true') {
+                    cleanedFormData.append(key, '');
+                }
+            } else {
+                if (value === "null" || value === "undefined") return;
+                cleanedFormData.append(key, value);
+            }
         });
 
         updateMutation.mutate(cleanedFormData);
@@ -153,22 +162,7 @@ const DiocesePresentationTab = () => {
                 />
             </div>
 
-            {/* C H R O N O L O G I E  (TIMELINE) */}
-            <div className="space-y-6 pt-6 border-t border-slate-100">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h3 className="text-xl font-heading font-bold text-slate-900 border-b pb-2">{t('admin_tab_history_timeline', "Chronologie Majeure (Dates Clés)")}</h3>
-                        <p className="text-sm text-slate-500 mt-2">{t('admin_timeline_tip', "Gérez les dates importantes (1934, 1960, 2009...) affichées sur le site.")}</p>
-                    </div>
-                </div>
 
-                <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100 flex items-center justify-center h-24">
-                    <p className="text-slate-500 font-medium text-sm flex items-center gap-2">
-                        <Info className="h-5 w-5 text-violet-500" />
-                        {t('admin_timeline_managed_below', "Utilisez l'onglet 'Historique' en haut de la page pour ajouter ou modifier ces dates spécifiques.")}
-                    </p>
-                </div>
-            </div>
 
             {/* E V Ê Q U E */}
             <div className="space-y-6 pt-6 border-t border-slate-100">
@@ -233,36 +227,29 @@ const DiocesePresentationTab = () => {
                 </div>
             </div>
 
-            {/* V I S I O N  &  M I S S I O N */}
+            {/* Titre de la section Chronologie */}
             <div className="space-y-6 pt-6 border-t border-slate-100">
                 <div>
-                    <h3 className="text-xl font-heading font-bold text-slate-900 border-b pb-2">{t('vision_title', "Vision & Mission")}</h3>
-                    <p className="text-sm text-slate-500 mt-2">{t('admin_vision_tip', "Gérez le titre et la description de la section Vision.")}</p>
+                    <h3 className="text-xl font-heading font-bold text-slate-900 border-b pb-2">{t('admin_tab_history_timeline_title', "Titre Chronologie Majeure")}</h3>
+                    <p className="text-sm text-slate-500 mt-2">{t('admin_timeline_title_tip', "Modifiez le titre affiché au-dessus de l'historique.")}</p>
                 </div>
-
                 <div className="space-y-2">
-                    <label htmlFor={`vision_title_${activeLang}`} className="text-sm font-bold text-slate-700 cursor-pointer">{t('admin_vision_title', "Titre de la Vision")} ({activeLang})</label>
+                    <label htmlFor={`history_title_${activeLang}`} className="text-sm font-bold text-slate-700 cursor-pointer">{t('admin_timeline_title_label', "Titre Chronologie")} ({activeLang})</label>
                     <Input
-                        id={`vision_title_${activeLang}`}
-                        name={`vision_title_${activeLang}`}
-                        key={`vision_title_${activeLang}`}
-                        defaultValue={presentation?.[`vision_title_${activeLang}`] || ""}
+                        id={`history_title_${activeLang}`}
+                        name={`history_title_${activeLang}`}
+                        key={`history_title_${activeLang}`}
+                        defaultValue={presentation?.[`history_title_${activeLang}`] || ""}
                         className="rounded-xl h-12 bg-slate-50/50"
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <label htmlFor={`vision_description_${activeLang}`} className="text-sm font-bold text-slate-700 cursor-pointer">{t('admin_vision_desc', "Description de la Vision")} ({activeLang})</label>
-                    <Textarea
-                        id={`vision_description_${activeLang}`}
-                        name={`vision_description_${activeLang}`}
-                        key={`vision_description_${activeLang}`}
-                        defaultValue={presentation?.[`vision_description_${activeLang}`] || ""}
-                        rows={4}
-                        className="w-full rounded-2xl min-h-[100px] bg-slate-50/50"
+                        placeholder="Ex: Chronologie Majeure, Dates Clés..."
                     />
                 </div>
             </div>
+
+            {/* C H R O N O L O G I E  (TIMELINE) Manager intégré */}
+            <TimelineManager activeLang={activeLang} />
+
+
 
             <div className="pt-6 border-t border-slate-100 flex justify-end">
                 <Button

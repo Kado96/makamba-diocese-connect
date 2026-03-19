@@ -11,6 +11,7 @@ import {
     fetchSermonCategories,
     fetchParishes,
     fetchMinistries,
+    fetchMinistryPage,
     fetchTimeline,
     fetchMissionAxes,
     fetchVisionValues,
@@ -25,6 +26,7 @@ import type {
     SiteSettings,
     Parish,
     Ministry,
+    MinistryPage,
     TimelineEvent,
     MissionAxe,
     VisionValue,
@@ -139,15 +141,28 @@ export function useParishes() {
  * Hook pour les ministères
  */
 export function useMinistries() {
-    const { i18n } = useTranslation();
-    const lang = i18n.language || 'fr';
     return useQuery<Ministry[]>({
-        queryKey: ['ministries', lang],
+        queryKey: ['ministries'],
         queryFn: async () => {
-            const data = await fetchMinistries(lang);
+            const data = await fetchMinistries();
             return data ?? [];
         },
-        staleTime: 10 * 60 * 1000,
+        staleTime: 1000, // Fréquence rapide pour l'admin
+    });
+}
+
+/**
+ * Hook pour la configuration de la page ministères (Hero, etc.)
+ */
+export function useMinistryPage() {
+    return useQuery<MinistryPage>({
+        queryKey: ['ministry-page'],
+        queryFn: async () => {
+            const data = await fetchMinistryPage();
+            if (!data) throw new Error('Could not fetch ministry page');
+            return data;
+        },
+        staleTime: 1000,
     });
 }
 
@@ -221,12 +236,13 @@ export function useTeamMembers() {
 export function useDiocesePresentation() {
     const { i18n } = useTranslation();
     const lang = i18n.language || 'fr';
-    return useQuery<DiocesePresentation | null>({
+    return useQuery<DiocesePresentation[]>({
         queryKey: ['diocese-presentation', lang],
         queryFn: async () => {
-            return await fetchDiocesePresentation(lang);
+            const data = await fetchDiocesePresentation(lang);
+            return data ?? [];
         },
-        staleTime: 1000, // 1 second - pour mise à jour immédiate
+        staleTime: 1000,
     });
 }
 

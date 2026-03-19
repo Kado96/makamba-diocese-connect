@@ -33,9 +33,10 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import DiocesePresentationTab from "./components/DiocesePresentationTab";
 import ImageFieldWithPreview from "./components/ImageFieldWithPreview";
+import VisionIntroManager from "./components/VisionIntroManager";
 
 const AdminDiocese = () => {
     const { t } = useTranslation();
@@ -47,32 +48,15 @@ const AdminDiocese = () => {
 
     const langs = [
         { code: "fr", label: "🇫🇷 FR" },
-        { code: "rn", label: "🇧🇮 RN" },
         { code: "en", label: "🇬🇧 EN" },
-        { code: "sw", label: "🇹🇿 SW" },
     ];
 
     // Queries
-    const { data: timeline, isLoading: loadingTimeline } = useQuery({
-        queryKey: ["admin-timeline", activeLang],
-        queryFn: async () => {
-            const res = await api.get(`/api/pages/timeline/?lang=${activeLang}`);
-            return res.data.results || res.data;
-        }
-    });
 
     const { data: axes, isLoading: loadingAxes } = useQuery({
         queryKey: ["admin-axes", activeLang],
         queryFn: async () => {
             const res = await api.get(`/api/pages/axes/?lang=${activeLang}`);
-            return res.data.results || res.data;
-        }
-    });
-
-    const { data: values, isLoading: loadingValues } = useQuery({
-        queryKey: ["admin-values", activeLang],
-        queryFn: async () => {
-            const res = await api.get(`/api/pages/values/?lang=${activeLang}`);
             return res.data.results || res.data;
         }
     });
@@ -124,14 +108,21 @@ const AdminDiocese = () => {
         const formData = new FormData(e.currentTarget);
         const cleanedFormData = new FormData();
         formData.forEach((value, key) => {
-            if (value instanceof File && value.size === 0) return;
-            if (value === "" || value === "null" || value === "undefined") return;
-            cleanedFormData.append(key, value);
+            if (key.startsWith('clear_')) return;
+            if (value instanceof File) {
+                if (value.size > 0) {
+                    cleanedFormData.append(key, value);
+                } else if (formData.get(`clear_${key}`) === 'true') {
+                    cleanedFormData.append(key, '');
+                }
+            } else {
+                if (value === "null" || value === "undefined") return;
+                cleanedFormData.append(key, value);
+            }
         });
 
         let endpoint = "";
         switch (currentTab) {
-            case "timeline": endpoint = "timeline"; break;
             case "vision": endpoint = "axes"; break;
             case "values": endpoint = "values"; break;
             case "team": endpoint = "team"; break;
@@ -144,7 +135,7 @@ const AdminDiocese = () => {
         });
     };
 
-    const isLoading = loadingTimeline || loadingAxes || loadingValues || loadingTeam;
+    const isLoading = loadingAxes || loadingTeam;
 
     if (isLoading) {
         return (
@@ -213,33 +204,7 @@ const AdminDiocese = () => {
                                                 <option value="en">{t('lang_en', 'Anglais')}</option>
                                         </select>
                                     </div>
-                                    {currentTab === "timeline" && (
-                                        <>
-                                            <div className="space-y-2">
-                                                <label htmlFor="diocese-year" className="text-sm font-bold text-slate-700">{t('admin_history_year', 'Année / Période')}</label>
-                                                <Input id="diocese-year" name="year" defaultValue={editingItem?.year} required placeholder={t('admin_history_year_placeholder', "Ex: 1935 ou 1935-1940")} className="rounded-xl h-11 shadow-sm border-slate-200" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label htmlFor="diocese-timeline-title" className="text-sm font-bold text-slate-700">{t('admin_title_label', 'Titre')}</label>
-                                                <Input id="diocese-timeline-title" name="title" defaultValue={editingItem?.title} required placeholder={t('admin_title_placeholder', "Titre de l'élément")} className="rounded-xl h-11 shadow-sm border-slate-200" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label htmlFor="diocese-timeline-desc" className="text-sm font-bold text-slate-700">{t('admin_desc_label', 'Description')}</label>
-                                                <Textarea id="diocese-timeline-desc" name="description" defaultValue={editingItem?.description} required placeholder={t('admin_desc_placeholder', "Description détaillée...")} className="rounded-xl min-h-[100px] shadow-sm border-slate-200" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label htmlFor="diocese-timeline-order" className="text-sm font-bold text-slate-700">{t('admin_order_label', 'Ordre')}</label>
-                                                <Input id="diocese-timeline-order" name="order" type="number" defaultValue={editingItem?.order || 0} className="rounded-xl h-11 shadow-sm border-slate-200" />
-                                            </div>
-                                            <ImageFieldWithPreview
-                                                id="diocese-timeline-image"
-                                                name="image"
-                                                label={t('admin_photo_label', 'Photo / Image')}
-                                                currentImageUrl={editingItem?.image_display}
-                                                aspectRatio="video"
-                                            />
-                                        </>
-                                    )}
+
 
                                     {currentTab === "vision" && (
                                         <>
@@ -252,8 +217,7 @@ const AdminDiocese = () => {
                                                 <Input id="diocese-axe-order" name="order" type="number" defaultValue={editingItem?.order || 0} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
                                             <ImageFieldWithPreview
-                                                id="diocese-axe-image"
-                                                name="image"
+                                                fieldName="image"
                                                 label={t('admin_photo_label', 'Photo / Image')}
                                                 currentImageUrl={editingItem?.image_display}
                                                 aspectRatio="video"
@@ -280,8 +244,7 @@ const AdminDiocese = () => {
                                                 <Input id="diocese-value-order" name="order" type="number" defaultValue={editingItem?.order || 0} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
                                             <ImageFieldWithPreview
-                                                id="diocese-value-image"
-                                                name="image"
+                                                fieldName="image"
                                                 label={t('admin_photo_label', 'Photo / Image (Optionnel)')}
                                                 currentImageUrl={editingItem?.image_display}
                                                 aspectRatio="square"
@@ -308,8 +271,7 @@ const AdminDiocese = () => {
                                                 <Input id="diocese-team-order" name="order" type="number" defaultValue={editingItem?.order || 0} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
                                             <ImageFieldWithPreview
-                                                id="diocese-team-image"
-                                                name="image"
+                                                fieldName="image"
                                                 label={t('admin_photo_label', 'Photo de Profil')}
                                                 currentImageUrl={editingItem?.image_display}
                                                 aspectRatio="portrait"
@@ -334,56 +296,55 @@ const AdminDiocese = () => {
                         <TabsTrigger value="presentation" className="rounded-xl font-bold py-3 px-6 data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm">
                             <Library className="h-4 w-4 mr-2" /> {t('admin_tab_presentation', "Présentation Générale")}
                         </TabsTrigger>
-                        <TabsTrigger value="timeline" className="rounded-xl font-bold py-3 px-6 data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm">
-                            <History className="h-4 w-4 mr-2" /> {t('admin_tab_history', "Historique")}
-                        </TabsTrigger>
+
                         <TabsTrigger value="vision" className="rounded-xl font-bold py-3 data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm">
                             <Target className="h-4 w-4 mr-2" /> {t('admin_tab_mission', "Mission")}
-                        </TabsTrigger>
-                        <TabsTrigger value="values" className="rounded-xl font-bold py-3 data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm">
-                            <Award className="h-4 w-4 mr-2" /> {t('admin_tab_values', "Valeurs")}
                         </TabsTrigger>
                         <TabsTrigger value="team" className="rounded-xl font-bold py-3 data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm">
                             <Users className="h-4 w-4 mr-2" /> {t('admin_tab_team', "Équipe")}
                         </TabsTrigger>
                     </TabsList>
 
-                    <AnimatePresence mode="wait">
-                        <TabsContent key={currentTab} value={currentTab} className="mt-0">
-                            {currentTab === "presentation" ? (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                >
-                                    <DiocesePresentationTab />
-                                </motion.div>
-                            ) : (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                                >
-                                    {currentTab === "timeline" && (Array.isArray(timeline) ? timeline : (timeline?.results || [])).map((item: any) => (
-                                        <ItemCard key={item.id} title={item.year} subtitle={item.title} content={item.description} image={item.image_display} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "timeline", id: item.id })} />
-                                    ))}
+                    {/* Onglet Présentation Générale */}
+                    <TabsContent value="presentation" className="mt-0">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                        >
+                            <DiocesePresentationTab />
+                        </motion.div>
+                    </TabsContent>
 
-                                    {currentTab === "vision" && (Array.isArray(axes) ? axes : (axes?.results || [])).map((item: any) => (
-                                        <ItemCard key={item.id} title={`${t('admin_axe_label', 'Axe')} #${item.order}`} content={item.text} image={item.image_display} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "axes", id: item.id })} />
-                                    ))}
+                    {/* Onglet Mission / Vision */}
+                    <TabsContent value="vision" className="mt-0">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="space-y-6"
+                        >
+                            <VisionIntroManager activeLang={activeLang} />
 
-                                    {currentTab === "values" && (Array.isArray(values) ? values : (values?.results || [])).map((item: any) => (
-                                        <ItemCard key={item.id} title={item.title} icon={item.icon} content={item.description} image={item.image_display} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "values", id: item.id })} />
-                                    ))}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {(Array.isArray(axes) ? axes : (axes?.results || [])).map((item: any) => (
+                                    <ItemCard key={item.id} title={`${t('admin_axe_label', 'Axe')} #${item.order}`} content={item.text} image={item.image_display} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "axes", id: item.id })} />
+                                ))}
+                            </div>
+                        </motion.div>
+                    </TabsContent>
 
-                                    {currentTab === "team" && (Array.isArray(team) ? team : (team?.results || [])).map((item: any) => (
-                                        <ItemCard key={item.id} title={item.name} subtitle={item.role} content={item.description} image={item.image_display} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "team", id: item.id })} />
-                                    ))}
-                                </motion.div>
-                            )}
-                        </TabsContent>
-                    </AnimatePresence>
+                    {/* Onglet Équipe */}
+                    <TabsContent value="team" className="mt-0">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {(Array.isArray(team) ? team : (team?.results || [])).map((item: any) => (
+                                    <ItemCard key={item.id} title={item.name} subtitle={item.role} content={item.description} image={item.image_display} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "team", id: item.id })} />
+                                ))}
+                            </div>
+                        </motion.div>
+                    </TabsContent>
                 </Tabs>
             </div>
         </AdminLayout>

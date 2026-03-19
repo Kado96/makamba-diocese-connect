@@ -119,84 +119,31 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             
             # Additional localized fields
             # Stats Localized Labels
-            'stat_years_label_fr', 'stat_years_label_rn', 'stat_years_label_en', 'stat_years_label_sw',
-            'stat_emissions_fr', 'stat_emissions_rn', 'stat_emissions_en', 'stat_emissions_sw',
-            'stat_audience_fr', 'stat_audience_rn', 'stat_audience_en', 'stat_audience_sw',
-            'stat_languages_fr', 'stat_languages_rn', 'stat_languages_en', 'stat_languages_sw',
-            'stat_years_desc_fr', 'stat_years_desc_rn', 'stat_years_desc_en', 'stat_years_desc_sw',
-            'stat_emissions_desc_fr', 'stat_emissions_desc_rn', 'stat_emissions_desc_en', 'stat_emissions_desc_sw',
-            'stat_audience_desc_fr', 'stat_audience_desc_rn', 'stat_audience_desc_en', 'stat_audience_desc_sw',
-            'stat_languages_desc_fr', 'stat_languages_desc_rn', 'stat_languages_desc_en', 'stat_languages_desc_sw',
-            
+            'stat_years_label_fr', 'stat_years_label_en',             'stat_emissions_fr', 'stat_emissions_en',             'stat_audience_fr', 'stat_audience_en',             'stat_languages_fr', 'stat_languages_en',             'stat_years_desc_fr', 'stat_years_desc_en',             'stat_emissions_desc_fr', 'stat_emissions_desc_en',             'stat_audience_desc_fr', 'stat_audience_desc_en',             'stat_languages_desc_fr', 'stat_languages_desc_en',             
             # Vision & Mission (Localized)
-            'vision_title_fr', 'vision_title_rn', 'vision_title_en', 'vision_title_sw',
-            'vision_description_fr', 'vision_description_rn', 'vision_description_en', 'vision_description_sw',
-            'vision_pillar1_title_fr', 'vision_pillar1_title_rn', 'vision_pillar1_title_en', 'vision_pillar1_title_sw',
-            'vision_pillar1_desc_fr', 'vision_pillar1_desc_rn', 'vision_pillar1_desc_en', 'vision_pillar1_desc_sw',
-            'vision_pillar2_title_fr', 'vision_pillar2_title_rn', 'vision_pillar2_title_en', 'vision_pillar2_title_sw',
-            'vision_pillar2_desc_fr', 'vision_pillar2_desc_rn', 'vision_pillar2_desc_en', 'vision_pillar2_desc_sw',
-            'vision_pillar3_title_fr', 'vision_pillar3_title_rn', 'vision_pillar3_title_en', 'vision_pillar3_title_sw',
-            'vision_pillar3_desc_fr', 'vision_pillar3_desc_rn', 'vision_pillar3_desc_en', 'vision_pillar3_desc_sw',
-            'vision_pillar1_icon', 'vision_pillar2_icon', 'vision_pillar3_icon',
+            'vision_title_fr', 'vision_title_en',             'vision_description_fr', 'vision_description_en',             'vision_pillar1_title_fr', 'vision_pillar1_title_en',             'vision_pillar1_desc_fr', 'vision_pillar1_desc_en',             'vision_pillar2_title_fr', 'vision_pillar2_title_en',             'vision_pillar2_desc_fr', 'vision_pillar2_desc_en',             'vision_pillar3_title_fr', 'vision_pillar3_title_en',             'vision_pillar3_desc_fr', 'vision_pillar3_desc_en',             'vision_pillar1_icon', 'vision_pillar2_icon', 'vision_pillar3_icon',
 
             # Engagement (Localized)
-            'engage_title_fr', 'engage_title_rn', 'engage_title_en', 'engage_title_sw',
-            'engage_description_fr', 'engage_description_rn', 'engage_description_en', 'engage_description_sw',
-            'engage_item1_title_fr', 'engage_item1_title_rn', 'engage_item1_title_en', 'engage_item1_title_sw',
-            'engage_item1_desc_fr', 'engage_item1_desc_rn', 'engage_item1_desc_en', 'engage_item1_desc_sw',
-            'engage_item1_cta_fr', 'engage_item1_cta_rn', 'engage_item1_cta_en', 'engage_item1_cta_sw',
-            'engage_item2_title_fr', 'engage_item2_title_rn', 'engage_item2_title_en', 'engage_item2_title_sw',
-            'engage_item2_desc_fr', 'engage_item2_desc_rn', 'engage_item2_desc_en', 'engage_item2_desc_sw',
-            'engage_item2_cta_fr', 'engage_item2_cta_rn', 'engage_item2_cta_en', 'engage_item2_cta_sw',
-            'engage_item3_title_fr', 'engage_item3_title_rn', 'engage_item3_title_en', 'engage_item3_title_sw',
-            'engage_item3_desc_fr', 'engage_item3_desc_rn', 'engage_item3_desc_en', 'engage_item3_desc_sw',
-            'engage_item3_cta_fr', 'engage_item3_cta_rn', 'engage_item3_cta_en', 'engage_item3_cta_sw',
-            'engage_item1_href', 'engage_item1_icon', 'engage_item2_href', 'engage_item2_icon', 'engage_item3_href', 'engage_item3_icon',
+            'engage_title_fr', 'engage_title_en',             'engage_description_fr', 'engage_description_en',             'engage_item1_title_fr', 'engage_item1_title_en',             'engage_item1_desc_fr', 'engage_item1_desc_en',             'engage_item1_cta_fr', 'engage_item1_cta_en',             'engage_item2_title_fr', 'engage_item2_title_en',             'engage_item2_desc_fr', 'engage_item2_desc_en',             'engage_item2_cta_fr', 'engage_item2_cta_en',             'engage_item3_title_fr', 'engage_item3_title_en',             'engage_item3_desc_fr', 'engage_item3_desc_en',             'engage_item3_cta_fr', 'engage_item3_cta_en',             'engage_item1_href', 'engage_item1_icon', 'engage_item2_href', 'engage_item2_icon', 'engage_item3_href', 'engage_item3_icon',
 
             # Parishes Section (Localized)
-            'parishes_title_fr', 'parishes_title_rn', 'parishes_title_en', 'parishes_title_sw',
-            'parishes_description_fr', 'parishes_description_rn', 'parishes_description_en', 'parishes_description_sw',
-            'parishes_map_title_fr', 'parishes_map_title_rn', 'parishes_map_title_en', 'parishes_map_title_sw',
-            'parishes_map_subtitle_fr', 'parishes_map_subtitle_rn', 'parishes_map_subtitle_en', 'parishes_map_subtitle_sw',
-            'parishes_map_stats_fr', 'parishes_map_stats_rn', 'parishes_map_stats_en', 'parishes_map_stats_sw',
-
+            'parishes_title_fr', 'parishes_title_en',             'parishes_description_fr', 'parishes_description_en',             'parishes_map_title_fr', 'parishes_map_title_en',             'parishes_map_subtitle_fr', 'parishes_map_subtitle_en',             'parishes_map_stats_fr', 'parishes_map_stats_en', 
             # Stories / Actualités Section (Localized)
-            'stories_badge_fr', 'stories_badge_rn', 'stories_badge_en', 'stories_badge_sw',
-            'stories_title_fr', 'stories_title_rn', 'stories_title_en', 'stories_title_sw',
-
+            'stories_badge_fr', 'stories_badge_en',             'stories_title_fr', 'stories_title_en', 
             # Stats CTA (Localized)
-            'stats_cta_title_fr', 'stats_cta_title_rn', 'stats_cta_title_en', 'stats_cta_title_sw',
-            'stats_cta_link_text_fr', 'stats_cta_link_text_rn', 'stats_cta_link_text_en', 'stats_cta_link_text_sw',
-
+            'stats_cta_title_fr', 'stats_cta_title_en',             'stats_cta_link_text_fr', 'stats_cta_link_text_en', 
             # Misc Localized
-            'about_content_fr', 'about_content_rn', 'about_content_en', 'about_content_sw',
-            'bible_verse_fr', 'bible_verse_rn', 'bible_verse_en', 'bible_verse_sw',
-            'bible_verse_ref_fr', 'bible_verse_ref_rn', 'bible_verse_ref_en', 'bible_verse_ref_sw',
-
+            'about_content_fr', 'about_content_en',             'bible_verse_fr', 'bible_verse_en',             'bible_verse_ref_fr', 'bible_verse_ref_en', 
             # Quote (Localized)
-            'quote_text_fr', 'quote_text_rn', 'quote_text_en', 'quote_text_sw',
-            'quote_author_name_fr', 'quote_author_name_rn', 'quote_author_name_en', 'quote_author_name_sw',
-            'quote_author_subtitle_fr', 'quote_author_subtitle_rn', 'quote_author_subtitle_en', 'quote_author_subtitle_sw',
-
+            'quote_text_fr', 'quote_text_en',             'quote_author_name_fr', 'quote_author_name_en',             'quote_author_subtitle_fr', 'quote_author_subtitle_en', 
             # Team (Localized)
-            'team_title_fr', 'team_title_rn', 'team_title_en', 'team_title_sw',
-            'team_description_fr', 'team_description_rn', 'team_description_en', 'team_description_sw',
-
+            'team_title_fr', 'team_title_en',             'team_description_fr', 'team_description_en', 
             # About Features (Localized)
-            'about_feature1_fr', 'about_feature1_rn', 'about_feature1_en', 'about_feature1_sw',
-            'about_feature2_fr', 'about_feature2_rn', 'about_feature2_en', 'about_feature2_sw',
-            'about_feature3_fr', 'about_feature3_rn', 'about_feature3_en', 'about_feature3_sw',
-            'about_feature4_fr', 'about_feature4_rn', 'about_feature4_en', 'about_feature4_sw',
-
+            'about_feature1_fr', 'about_feature1_en',             'about_feature2_fr', 'about_feature2_en',             'about_feature3_fr', 'about_feature3_en',             'about_feature4_fr', 'about_feature4_en', 
             # About Title & Badge (Localized)
-            'about_title_fr', 'about_title_rn', 'about_title_en', 'about_title_sw',
-            'about_title_accent_fr', 'about_title_accent_rn', 'about_title_accent_en', 'about_title_accent_sw',
-            'about_badge_fr', 'about_badge_rn', 'about_badge_en', 'about_badge_sw',
-
+            'about_title_fr', 'about_title_en',             'about_title_accent_fr', 'about_title_accent_en',             'about_badge_fr', 'about_badge_en', 
             # Contact (Localized)
-            'contact_content_fr', 'contact_content_rn', 'contact_content_en', 'contact_content_sw',
-            'contact_badge_fr', 'contact_badge_rn', 'contact_badge_en', 'contact_badge_sw',
-
+            'contact_content_fr', 'contact_content_en',             'contact_badge_fr', 'contact_badge_en', 
             # Diocese / History / Vision Intro (Localized)
             'diocese_subtitle_fr',
             'history_subtitle_fr',
@@ -205,46 +152,22 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             'bishop_bio_p1_fr', 'bishop_bio_p2_fr',
 
             # Button labels (Localized)
-            'btn_emissions_fr', 'btn_emissions_rn', 'btn_emissions_en', 'btn_emissions_sw',
-            'btn_teachings_fr', 'btn_teachings_rn', 'btn_teachings_en', 'btn_teachings_sw',
-            'btn_meditation_fr', 'btn_meditation_rn', 'btn_meditation_en', 'btn_meditation_sw',
-
+            'btn_emissions_fr', 'btn_emissions_en',             'btn_teachings_fr', 'btn_teachings_en',             'btn_meditation_fr', 'btn_meditation_en', 
             # Section Featured (Localized)
-            'section_featured_fr', 'section_featured_rn', 'section_featured_en', 'section_featured_sw',
-            'section_featured_badge_fr', 'section_featured_badge_rn', 'section_featured_badge_en', 'section_featured_badge_sw',
-            'section_featured_accent_fr', 'section_featured_accent_rn', 'section_featured_accent_en', 'section_featured_accent_sw',
-            'section_featured_desc_fr', 'section_featured_desc_rn', 'section_featured_desc_en', 'section_featured_desc_sw',
-
+            'section_featured_fr', 'section_featured_en',             'section_featured_badge_fr', 'section_featured_badge_en',             'section_featured_accent_fr', 'section_featured_accent_en',             'section_featured_desc_fr', 'section_featured_desc_en', 
             # Section Categories (Localized)
-            'section_categories_fr', 'section_categories_rn', 'section_categories_en', 'section_categories_sw',
-            'section_categories_accent_fr', 'section_categories_accent_rn', 'section_categories_accent_en', 'section_categories_accent_sw',
-            'section_categories_desc_fr', 'section_categories_desc_rn', 'section_categories_desc_en', 'section_categories_desc_sw',
-
+            'section_categories_fr', 'section_categories_en',             'section_categories_accent_fr', 'section_categories_accent_en',             'section_categories_desc_fr', 'section_categories_desc_en', 
             # Section Announcements (Localized)
-            'section_announcements_badge_fr', 'section_announcements_badge_rn', 'section_announcements_badge_en', 'section_announcements_badge_sw',
-            'section_announcements_title_fr', 'section_announcements_title_rn', 'section_announcements_title_en', 'section_announcements_title_sw',
-            'section_announcements_accent_fr', 'section_announcements_accent_rn', 'section_announcements_accent_en', 'section_announcements_accent_sw',
-            'section_announcements_desc_fr', 'section_announcements_desc_rn', 'section_announcements_desc_en', 'section_announcements_desc_sw',
-
+            'section_announcements_badge_fr', 'section_announcements_badge_en',             'section_announcements_title_fr', 'section_announcements_title_en',             'section_announcements_accent_fr', 'section_announcements_accent_en',             'section_announcements_desc_fr', 'section_announcements_desc_en', 
             # Section Testimonials (Localized)
-            'section_testimonials_badge_fr', 'section_testimonials_badge_rn', 'section_testimonials_badge_en', 'section_testimonials_badge_sw',
-            'section_testimonials_title_fr', 'section_testimonials_title_rn', 'section_testimonials_title_en', 'section_testimonials_title_sw',
-            'section_testimonials_accent_fr', 'section_testimonials_accent_rn', 'section_testimonials_accent_en', 'section_testimonials_accent_sw',
-            'section_testimonials_desc_fr', 'section_testimonials_desc_rn', 'section_testimonials_desc_en', 'section_testimonials_desc_sw',
-
+            'section_testimonials_badge_fr', 'section_testimonials_badge_en',             'section_testimonials_title_fr', 'section_testimonials_title_en',             'section_testimonials_accent_fr', 'section_testimonials_accent_en',             'section_testimonials_desc_fr', 'section_testimonials_desc_en', 
             # Page titles (Localized)
-            'page_courses_title_fr', 'page_courses_title_rn', 'page_courses_title_en', 'page_courses_title_sw',
-            'page_about_title_fr', 'page_about_title_rn', 'page_about_title_en', 'page_about_title_sw',
-            'page_contact_title_fr', 'page_contact_title_rn', 'page_contact_title_en', 'page_contact_title_sw',
-
+            'page_courses_title_fr', 'page_courses_title_en',             'page_about_title_fr', 'page_about_title_en',             'page_contact_title_fr', 'page_contact_title_en', 
             # Footer Brand
             'footer_brand_name', 'footer_brand_subtitle',
 
             # Footer Quick Links & Social (Localized)
-            'footer_quick_links_title_fr', 'footer_quick_links_title_rn', 'footer_quick_links_title_en', 'footer_quick_links_title_sw',
-            'footer_contact_title_fr', 'footer_contact_title_rn', 'footer_contact_title_en', 'footer_contact_title_sw',
-            'footer_social_title_fr', 'footer_social_title_rn', 'footer_social_title_en', 'footer_social_title_sw',
-
+            'footer_quick_links_title_fr', 'footer_quick_links_title_en',             'footer_contact_title_fr', 'footer_contact_title_en',             'footer_social_title_fr', 'footer_social_title_en', 
             # Header options
             'show_admin_button',
 
@@ -260,20 +183,9 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             'stats_cta_href',
             
             # Hero Fields (Localized)
-            'hero_title_fr', 'hero_title_rn', 'hero_title_en', 'hero_title_sw',
-            'hero_subtitle_fr', 'hero_subtitle_rn', 'hero_subtitle_en', 'hero_subtitle_sw',
-            'hero_badge_fr', 'hero_badge_rn', 'hero_badge_en', 'hero_badge_sw',
-            'hero_btn1_text_fr', 'hero_btn1_text_rn', 'hero_btn1_text_en', 'hero_btn1_text_sw',
-            'hero_btn1_link_fr', 'hero_btn1_link_rn', 'hero_btn1_link_en', 'hero_btn1_link_sw',
-            'hero_btn2_text_fr', 'hero_btn2_text_rn', 'hero_btn2_text_en', 'hero_btn2_text_sw',
-            'hero_btn2_link_fr', 'hero_btn2_link_rn', 'hero_btn2_link_en', 'hero_btn2_link_sw',
-
+            'hero_title_fr', 'hero_title_en',             'hero_subtitle_fr', 'hero_subtitle_en',             'hero_badge_fr', 'hero_badge_en',             'hero_btn1_text_fr', 'hero_btn1_text_en',             'hero_btn1_link_fr', 'hero_btn1_link_en',             'hero_btn2_text_fr', 'hero_btn2_text_en',             'hero_btn2_link_fr', 'hero_btn2_link_en', 
             # Header & Footer Fields (Localized)
-            'header_slogan_fr', 'header_slogan_rn', 'header_slogan_en', 'header_slogan_sw',
-            'header_admin_btn_fr', 'header_admin_btn_rn', 'header_admin_btn_en', 'header_admin_btn_sw',
-            'footer_description_fr', 'footer_description_rn', 'footer_description_en', 'footer_description_sw',
-            'footer_copyright_fr', 'footer_copyright_rn', 'footer_copyright_en', 'footer_copyright_sw',
-
+            'header_slogan_fr', 'header_slogan_en',             'header_admin_btn_fr', 'header_admin_btn_en',             'footer_description_fr', 'footer_description_en',             'footer_copyright_fr', 'footer_copyright_en', 
             'created_at', 'updated_at',
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
@@ -281,7 +193,9 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     def _get_lang(self):
         request = self.context.get('request')
         if request:
-            return request.query_params.get('lang') or request.query_params.get('language') or 'fr'
+            # Handle both DRF Request (query_params) and Django Request (GET)
+            params = getattr(request, 'query_params', getattr(request, 'GET', {}))
+            return params.get('lang') or params.get('language') or 'fr'
         return 'fr'
 
     def _resolve_localized(self, obj, field_base):

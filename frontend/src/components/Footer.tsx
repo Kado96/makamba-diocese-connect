@@ -194,16 +194,11 @@ const Footer = () => {
         <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex flex-col items-center md:items-start gap-2">
             <p className="font-body text-[13px] text-slate-600 font-medium">
-              {settings?.[`footer_copyright_${i18n.language}`] || settings?.footer_copyright_fr || `© ${new Date().getFullYear()} Diocese Makamba.`}
+              © 2026 Diocèse Makamba. Tous droits réservés.
             </p>
-            <p className="text-[11px] text-slate-700 font-bold uppercase tracking-[0.2em]">{t('footer_tagline')}</p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-10 text-[11px] font-black uppercase tracking-[0.3em] text-slate-500">
-            <Link to="/contact" className="hover:text-primary transition-colors">{t('footer_privacy', 'Confidentialité')}</Link>
-            <Link to="/contact" className="hover:text-primary transition-colors">{t('footer_legal', 'Mentions Légales')}</Link>
-            <Link to="/contact" className="hover:text-primary transition-colors">{t('footer_support', 'Support')}</Link>
-          </div>
+
         </div>
 
       </div>

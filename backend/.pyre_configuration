@@ -8,7 +8,7 @@
   "exclude": [
     "venv/.*"
   ],
-  "python_version": "3.10",
+  "python_version": "3.11",
   "python_platform": "windows",
   "features": {
     "always_infer_return_types": true

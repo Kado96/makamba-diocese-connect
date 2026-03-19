@@ -5,32 +5,40 @@ from django.utils.text import slugify
 
 class SermonCategory(models.Model):
     id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=100)
+    name_fr = models.CharField(max_length=100, verbose_name="Nom (FR)", default="Catégorie")
+    name_en = models.CharField(max_length=100, verbose_name="Nom (EN)", blank=True, null=True)
+    
     slug = models.SlugField(max_length=120, unique=True, blank=True)
-    description = models.TextField(blank=True)
+    
+    description_fr = models.TextField(blank=True, verbose_name="Description (FR)")
+    description_en = models.TextField(blank=True, verbose_name="Description (EN)")
+    
     icon = models.CharField(max_length=10, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Champs obsolètes (pour migration)
+    name = models.CharField(max_length=100, blank=True, null=True, help_text="OBSOLÈTE: Utiliser name_fr/en")
+    description = models.TextField(blank=True, null=True, help_text="OBSOLÈTE: Utiliser description_fr/en")
+
     class Meta:
-        ordering = ["name"]
+        ordering = ["name_fr"]
         verbose_name_plural = "Sermon categories"
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = slugify(self.name_fr or self.name or "category")
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return self.name_fr or self.name or "Sermon Category"
 
 
 class Sermon(models.Model):
+    # Langues autorisées pour le MEDIA lui-même (facultatif si bilingue)
     LANGUAGE_CHOICES = (
         ("fr", "Français"),
-        ("rn", "Kirundi"),
         ("en", "English"),
-        ("sw", "Kiswahili"),
     )
 
     CONTENT_TYPE_CHOICES = (
@@ -50,11 +58,20 @@ class Sermon(models.Model):
     content_type = models.CharField(
         max_length=10, choices=CONTENT_TYPE_CHOICES, default="video"
     )
-    title = models.CharField(max_length=200)
+    
+    title_fr = models.CharField(max_length=200, verbose_name="Titre (FR)", default="Sermon")
+    title_en = models.CharField(max_length=200, verbose_name="Titre (EN)", blank=True, null=True)
+    
     slug = models.SlugField(max_length=220, unique=True, blank=True)
-    description = models.TextField()
+    
+    description_fr = models.TextField(verbose_name="Description (FR)")
+    description_en = models.TextField(verbose_name="Description (EN)", blank=True, null=True)
+    
     preacher_name = models.CharField(max_length=120)
-    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default="fr")
+    
+    # Langue du contenu principal (choix restreint)
+    language_primary = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default="fr", verbose_name="Langue du média")
+    
     duration_minutes = models.PositiveIntegerField(null=True, blank=True)
     video_url = models.URLField(blank=True, help_text="URL YouTube ou lien direct")
     video_file = models.FileField(
@@ -84,13 +101,18 @@ class Sermon(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Champs obsolètes (pour migration)
+    title = models.CharField(max_length=200, blank=True, null=True, help_text="OBSOLÈTE: Utiliser title_fr/en")
+    description = models.TextField(blank=True, null=True, help_text="OBSOLÈTE: Utiliser description_fr/en")
+    language = models.CharField(max_length=2, blank=True, null=True, help_text="OBSOLÈTE: Utiliser language_primary")
+
     class Meta:
         ordering = ["-sermon_date", "-created_at"]
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            self.slug = slugify(self.title_fr or self.title or "sermon")
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.title
+        return self.title_fr or self.title or "Sermon"

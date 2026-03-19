@@ -33,7 +33,7 @@ if parent_dir not in sys.path:
 if os.getenv('DEBUG', '').lower() == 'true' or 'render' in os.getcwd().lower():
     print(f"[CONFIG] PYTHONPATH configure:")
     print(f"   - backend_dir: {backend_dir}")
-    print(f"   - sys.path (premiers 3): {sys.path[:3]}")
+    print(f"   - sys.path (premiers 3): {list(sys.path)[:3]}")
     # Tester l'import
     try:
         import api.settings

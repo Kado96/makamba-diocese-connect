@@ -7,15 +7,22 @@ class AnnouncementImageInline(admin.TabularInline):
 
 @admin.register(Announcement)
 class AnnouncementAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'priority', 'event_date', 'is_active', 'language')
-    list_filter = ('language', 'category', 'priority', 'is_active', 'event_date')
-    search_fields = ('title', 'content')
+    list_display = ('title_fr', 'category', 'priority', 'event_date', 'is_active')
+    list_filter = ('category', 'priority', 'is_active', 'event_date')
+    search_fields = ('title_fr', 'title_en', 'content_fr', 'content_en')
     inlines = [AnnouncementImageInline]
     fieldsets = (
-        (None, {
-            'fields': ('title', 'language', 'category', 'content', 'is_active')
+        ('Français', {
+            'fields': ('title_fr', 'content_fr')
         }),
-        ('Planification & Visuels', {
-            'fields': ('priority', 'event_date', 'image'),
+        ('English', {
+            'fields': ('title_en', 'content_en')
+        }),
+        ('Configuration', {
+            'fields': ('category', 'priority', 'event_date', 'image', 'is_active'),
+        }),
+        ('Migration (Obsolète)', {
+            'classes': ('collapse',),
+            'fields': ('title', 'content', 'language'),
         }),
     )

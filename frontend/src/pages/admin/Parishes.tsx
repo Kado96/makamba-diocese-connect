@@ -58,9 +58,7 @@ const AdminParishes = () => {
 
     const langs = [
         { code: "fr", label: "🇫🇷 FR" },
-        { code: "rn", label: "🇧🇮 RN" },
         { code: "en", label: "🇬🇧 EN" },
-        { code: "sw", label: "🇹🇿 SW" },
     ];
 
     const { data: parishes, isLoading } = useQuery({
@@ -295,8 +293,6 @@ const AdminParishes = () => {
                                                 <TableCell className="py-5 text-center">
                                                     <Badge variant="outline" className="capitalize">
                                                         {item.language === 'fr' && t('lang_fr', 'Français')}
-                                                        {item.language === 'rn' && t('lang_rn', 'Kirundi')}
-                                                        {item.language === 'sw' && t('lang_sw', 'Kiswahili')}
                                                         {item.language === 'en' && t('lang_en', 'English')}
                                                     </Badge>
                                                 </TableCell>

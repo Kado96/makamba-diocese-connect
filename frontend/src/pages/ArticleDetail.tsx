@@ -30,9 +30,9 @@ const ArticleDetail = () => {
     });
 
     const { data: article, isLoading } = useQuery({
-        queryKey: ["article", id],
+        queryKey: ["article", id, i18n.language],
         queryFn: async () => {
-            const response = await api.get(`/api/announcements/${id}/`);
+            const response = await api.get(`/api/announcements/${id}/?language=${i18n.language}`);
             return response.data;
         }
     });
