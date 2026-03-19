@@ -16,9 +16,12 @@ const ParishesSection = () => {
   const description = settings?.[`parishes_description_${lang}`] || settings?.parishes_description_fr || t('parishes_hero_description', "Le diocèse de Makamba compte une vingtaine de paroisses réparties dans toute la province, chacune au service de sa communauté locale avec des équipes pastorales dévouées.");
   const mapTitle = settings?.[`parishes_map_title_${lang}`] || settings?.parishes_map_title_fr || t('parishes_map_title_fr', "Province de Makamba");
   const mapSubtitle = settings?.[`parishes_map_subtitle_${lang}`] || settings?.parishes_map_subtitle_fr || t('parishes_map_subtitle_fr', "Burundi, Afrique de l'Est");
-  const mapStats = settings?.[`parishes_map_stats_${lang}`] || settings?.parishes_map_stats_fr || t('parishes_map_stats_fr', "20 paroisses • 8 communes");
-  const statParishes = "20";
-  const statCommunes = "8";
+  const badge = settings?.[`parishes_badge_${lang}`] || settings?.parishes_badge_fr || t('stats_cta_title', 'Découvrir le diocèse');
+  const statParishes = settings?.stat_audience_value || "20";
+  const statCommunes = settings?.stat_languages_value || "8";
+  
+  const statParishesLabel = settings?.[`stat_audience_${lang}`] || settings?.stat_audience_fr || t('parishes_faithful_active', 'paroisses en activité');
+  const statCommunesLabel = settings?.[`stat_languages_${lang}`] || settings?.stat_languages_fr || t('parishes_commune', 'communes couvertes');
 
   return (
     <section className="section-padding bg-background relative z-10">
@@ -61,7 +64,7 @@ const ParishesSection = () => {
               transition={{ duration: 0.6 }}
             >
               <p className="font-body text-primary font-bold text-sm uppercase tracking-[0.15em] mb-3">
-                {t('stats_cta_title', 'Découvrir le diocèse')}
+                {badge}
               </p>
               <h2 className="font-heading text-4xl md:text-5xl lg:text-5xl font-bold text-foreground mb-4 leading-tight">
                 {title}
@@ -79,7 +82,7 @@ const ParishesSection = () => {
                     {statParishes}
                   </p>
                   <p className="font-body text-foreground font-bold text-xs md:text-sm uppercase tracking-wider">
-                    {t('parishes_faithful_active', 'paroisses en activité')}
+                    {statParishesLabel}
                   </p>
                 </div>
 
@@ -88,7 +91,7 @@ const ParishesSection = () => {
                     {statCommunes}
                   </p>
                   <p className="font-body text-foreground font-bold text-xs md:text-sm uppercase tracking-wider">
-                    {t('parishes_commune', 'communes couvertes')}
+                    {statCommunesLabel}
                   </p>
                 </div>
               </div>

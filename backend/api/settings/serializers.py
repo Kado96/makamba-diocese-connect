@@ -393,7 +393,7 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             try:
                 minimal_data = {
                     'id': getattr(instance, 'id', 1),
-                    'site_name': getattr(instance, 'site_name', 'Shalom Ministry'),
+                    'site_name': getattr(instance, 'site_name', 'Diocese Makamba'),
                     'description': getattr(instance, 'description', ''),
                     'logo': None,
                     'logo_url': getattr(instance, 'logo_url', '') or None,
@@ -423,8 +423,8 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
                 # Dernier recours : retourner un dictionnaire très basique
                 return {
                     'id': 1,
-                    'site_name': 'Shalom Ministry',
-                    'description': 'Plateforme de formation chrétienne en ligne',
+                    'site_name': 'Diocese Makamba',
+                    'description': 'Site officiel du Diocese Makamba Connect',
                     'error': 'serialization_error',
                     'message': f'Erreur de sérialisation: {str(e)}'
                 }
@@ -449,12 +449,9 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
         if not image_field or not hasattr(image_field, 'url'):
             return None
         try:
-            url = image_field.url
-            request = self.context.get('request')
-            if request:
-                # build_absolute_uri gère déjà correctement si le chemin commence par /
-                return request.build_absolute_uri(url)
-            return url
+            # Retourner le chemin relatif (/api/media/...) 
+            # Cela fonctionne en dev (proxy Vite) et en prod (même domaine)
+            return image_field.url
         except Exception:
             return None
 

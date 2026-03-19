@@ -127,14 +127,50 @@ export interface DiocesePresentation {
     id: number;
     hero_image: string | null;
     hero_image_display?: string | null;
-    history_text: string | null;
+    
+    // localized hero subtitle
+    hero_subtitle_fr?: string | null;
+    hero_subtitle_rn?: string | null;
+    hero_subtitle_en?: string | null;
+    hero_subtitle_sw?: string | null;
+
+    // localized history text
+    history_text_fr?: string | null;
+    history_text_rn?: string | null;
+    history_text_en?: string | null;
+    history_text_sw?: string | null;
+
+    // localized bishop message
+    bishop_message_fr?: string | null;
+    bishop_message_rn?: string | null;
+    bishop_message_en?: string | null;
+    bishop_message_sw?: string | null;
+
+    // localized organization text
+    organization_text_fr?: string | null;
+    organization_text_rn?: string | null;
+    organization_text_en?: string | null;
+    organization_text_sw?: string | null;
+
+    // localized vision vision
+    vision_title_fr?: string | null;
+    vision_title_rn?: string | null;
+    vision_title_en?: string | null;
+    vision_title_sw?: string | null;
+
+    vision_description_fr?: string | null;
+    vision_description_rn?: string | null;
+    vision_description_en?: string | null;
+    vision_description_sw?: string | null;
+
     history_image: string | null;
     history_image_display?: string | null;
     bishop_name: string | null;
-    bishop_message: string | null;
+    bishop_message: string | null; // Old field for backward compatibility or direct use if needed
     bishop_photo: string | null;
     bishop_photo_display?: string | null;
-    organization_text: string | null;
+    organization_text: string | null; // Old field
+    [key: string]: any; // Allow dynamic access like [field_${safeLang}]
 }
 
 export interface Ministry {
@@ -156,6 +192,7 @@ export interface TimelineEvent {
     description: string;
     image?: string;
     image_display?: string;
+    language: string;
     order: number;
 }
 
@@ -164,6 +201,7 @@ export interface MissionAxe {
     text: string;
     image?: string;
     image_display?: string;
+    language: string;
     order: number;
 }
 
@@ -174,6 +212,7 @@ export interface VisionValue {
     image?: string;
     image_display?: string;
     description: string;
+    language: string;
     order: number;
 }
 
@@ -184,6 +223,7 @@ export interface TeamMember {
     description: string;
     image?: string;
     image_display?: string;
+    language: string;
     order: number;
 }
 

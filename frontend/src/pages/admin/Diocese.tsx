@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import DiocesePresentationTab from "./components/DiocesePresentationTab";
+import ImageFieldWithPreview from "./components/ImageFieldWithPreview";
 
 const AdminDiocese = () => {
     const { t } = useTranslation();
@@ -209,40 +210,34 @@ const AdminDiocese = () => {
                                         <label htmlFor="item-lang" className="text-sm font-bold text-slate-700">{t('admin_lang_label', 'Langue')}</label>
                                         <select id="item-lang" name="language" defaultValue={editingItem?.language || activeLang} className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
                                             <option value="fr">{t('lang_fr', 'Français')}</option>
-                                            <option value="rn">{t('lang_rn', 'Kirundi')}</option>
-                                            <option value="en">{t('lang_en', 'Anglais')}</option>
-                                            <option value="sw">{t('lang_sw', 'Swahili')}</option>
+                                                <option value="en">{t('lang_en', 'Anglais')}</option>
                                         </select>
                                     </div>
                                     {currentTab === "timeline" && (
                                         <>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-year" className="text-sm font-bold text-slate-700">{t('admin_history_year', 'Année / Période')}</label>
-                                                <Input id="diocese-year" name="year" defaultValue={editingItem?.year} required placeholder={t('admin_history_year_placeholder', "Ex: 1935 ou 1935-1940")} className="rounded-xl h-12" />
+                                                <Input id="diocese-year" name="year" defaultValue={editingItem?.year} required placeholder={t('admin_history_year_placeholder', "Ex: 1935 ou 1935-1940")} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-timeline-title" className="text-sm font-bold text-slate-700">{t('admin_title_label', 'Titre')}</label>
-                                                <Input id="diocese-timeline-title" name="title" defaultValue={editingItem?.title} required placeholder={t('admin_title_placeholder', "Titre de l'élément")} className="rounded-xl h-12" />
+                                                <Input id="diocese-timeline-title" name="title" defaultValue={editingItem?.title} required placeholder={t('admin_title_placeholder', "Titre de l'élément")} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-timeline-desc" className="text-sm font-bold text-slate-700">{t('admin_desc_label', 'Description')}</label>
-                                                <Textarea id="diocese-timeline-desc" name="description" defaultValue={editingItem?.description} required placeholder={t('admin_desc_placeholder', "Description détaillée...")} className="rounded-xl min-h-[100px]" />
+                                                <Textarea id="diocese-timeline-desc" name="description" defaultValue={editingItem?.description} required placeholder={t('admin_desc_placeholder', "Description détaillée...")} className="rounded-xl min-h-[100px] shadow-sm border-slate-200" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-timeline-order" className="text-sm font-bold text-slate-700">{t('admin_order_label', 'Ordre')}</label>
-                                                <Input id="diocese-timeline-order" name="order" type="number" defaultValue={editingItem?.order || 0} className="rounded-xl h-12" />
+                                                <Input id="diocese-timeline-order" name="order" type="number" defaultValue={editingItem?.order || 0} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
-                                            <div className="space-y-2">
-                                                <label htmlFor="diocese-timeline-image" className="text-sm font-bold text-slate-700">{t('admin_photo_label', 'Photo / Image')}</label>
-                                                <div className="flex flex-col gap-3">
-                                                    {editingItem?.image_display && (
-                                                        <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
-                                                            <img src={editingItem.image_display} alt="Photo" className="object-cover w-full h-full bg-slate-50" />
-                                                        </div>
-                                                    )}
-                                                    <Input id="diocese-timeline-image" name="image" type="file" accept="image/*" className="rounded-xl h-11" />
-                                                </div>
-                                            </div>
+                                            <ImageFieldWithPreview
+                                                id="diocese-timeline-image"
+                                                name="image"
+                                                label={t('admin_photo_label', 'Photo / Image')}
+                                                currentImageUrl={editingItem?.image_display}
+                                                aspectRatio="video"
+                                            />
                                         </>
                                     )}
 
@@ -250,23 +245,19 @@ const AdminDiocese = () => {
                                         <>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-axe-text" className="text-sm font-bold text-slate-700">{t('admin_axe_label', 'Axe de Mission')}</label>
-                                                <Input id="diocese-axe-text" name="text" defaultValue={editingItem?.text} required placeholder={t('admin_axe_placeholder', "Ex: Évangélisation")} className="rounded-xl h-12" />
+                                                <Input id="diocese-axe-text" name="text" defaultValue={editingItem?.text} required placeholder={t('admin_axe_placeholder', "Ex: Évangélisation")} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-axe-order" className="text-sm font-bold text-slate-700">{t('admin_order_label', 'Ordre')}</label>
-                                                <Input id="diocese-axe-order" name="order" type="number" defaultValue={editingItem?.order || 0} className="rounded-xl h-12" />
+                                                <Input id="diocese-axe-order" name="order" type="number" defaultValue={editingItem?.order || 0} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
-                                            <div className="space-y-2">
-                                                <label htmlFor="diocese-axe-image" className="text-sm font-bold text-slate-700">{t('admin_photo_label', 'Photo / Image')}</label>
-                                                <div className="flex flex-col gap-3">
-                                                    {editingItem?.image_display && (
-                                                        <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
-                                                            <img src={editingItem.image_display} alt="Photo" className="object-cover w-full h-full bg-slate-50" />
-                                                        </div>
-                                                    )}
-                                                    <Input id="diocese-axe-image" name="image" type="file" accept="image/*" className="rounded-xl h-11" />
-                                                </div>
-                                            </div>
+                                            <ImageFieldWithPreview
+                                                id="diocese-axe-image"
+                                                name="image"
+                                                label={t('admin_photo_label', 'Photo / Image')}
+                                                currentImageUrl={editingItem?.image_display}
+                                                aspectRatio="video"
+                                            />
                                         </>
                                     )}
 
@@ -274,31 +265,27 @@ const AdminDiocese = () => {
                                         <>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-value-icon" className="text-sm font-bold text-slate-700">{t('admin_icon_label', 'Icône (Lucide)')}</label>
-                                                <Input id="diocese-value-icon" name="icon" defaultValue={editingItem?.icon} required placeholder={t('admin_icon_placeholder', "Ex: Cross, Heart, Users")} className="rounded-xl h-12" />
+                                                <Input id="diocese-value-icon" name="icon" defaultValue={editingItem?.icon} required placeholder={t('admin_icon_placeholder', "Ex: Cross, Heart, Users")} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-value-title" className="text-sm font-bold text-slate-700">{t('admin_title_label', 'Titre')}</label>
-                                                <Input id="diocese-value-title" name="title" defaultValue={editingItem?.title} required placeholder={t('admin_title_placeholder', "Titre de la valeur")} className="rounded-xl h-12" />
+                                                <Input id="diocese-value-title" name="title" defaultValue={editingItem?.title} required placeholder={t('admin_title_placeholder', "Titre de la valeur")} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-value-desc" className="text-sm font-bold text-slate-700">{t('admin_desc_label', 'Description')}</label>
-                                                <Textarea id="diocese-value-desc" name="description" defaultValue={editingItem?.description} required placeholder={t('admin_desc_placeholder', "Description détaillée...")} className="rounded-xl min-h-[100px]" />
+                                                <Textarea id="diocese-value-desc" name="description" defaultValue={editingItem?.description} required placeholder={t('admin_desc_placeholder', "Description détaillée...")} className="rounded-xl min-h-[100px] shadow-sm border-slate-200" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-value-order" className="text-sm font-bold text-slate-700">{t('admin_order_label', 'Ordre')}</label>
-                                                <Input id="diocese-value-order" name="order" type="number" defaultValue={editingItem?.order || 0} className="rounded-xl h-12" />
+                                                <Input id="diocese-value-order" name="order" type="number" defaultValue={editingItem?.order || 0} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
-                                            <div className="space-y-2">
-                                                <label htmlFor="diocese-value-image" className="text-sm font-bold text-slate-700">{t('admin_photo_label', 'Photo / Image (Optionnel)')}</label>
-                                                <div className="flex flex-col gap-3">
-                                                    {editingItem?.image_display && (
-                                                        <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
-                                                            <img src={editingItem.image_display} alt="Photo" className="object-cover w-full h-full bg-slate-50" />
-                                                        </div>
-                                                    )}
-                                                    <Input id="diocese-value-image" name="image" type="file" accept="image/*" className="rounded-xl h-11" />
-                                                </div>
-                                            </div>
+                                            <ImageFieldWithPreview
+                                                id="diocese-value-image"
+                                                name="image"
+                                                label={t('admin_photo_label', 'Photo / Image (Optionnel)')}
+                                                currentImageUrl={editingItem?.image_display}
+                                                aspectRatio="square"
+                                            />
                                         </>
                                     )}
 
@@ -306,31 +293,27 @@ const AdminDiocese = () => {
                                         <>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-team-name" className="text-sm font-bold text-slate-700">{t('admin_name_label', 'Nom Complet')}</label>
-                                                <Input id="diocese-team-name" name="name" defaultValue={editingItem?.name} required placeholder={t('admin_name_placeholder', "Prénom Nom")} className="rounded-xl h-12" />
+                                                <Input id="diocese-team-name" name="name" defaultValue={editingItem?.name} required placeholder={t('admin_name_placeholder', "Prénom Nom")} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-team-role" className="text-sm font-bold text-slate-700">{t('admin_role_label', 'Rôle / Titre')}</label>
-                                                <Input id="diocese-team-role" name="role" defaultValue={editingItem?.role} required placeholder={t('admin_role_placeholder', "Ex: Évêque de Makamba")} className="rounded-xl h-12" />
+                                                <Input id="diocese-team-role" name="role" defaultValue={editingItem?.role} required placeholder={t('admin_role_placeholder', "Ex: Évêque de Makamba")} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-team-bio" className="text-sm font-bold text-slate-700">{t('admin_bio_label', 'Bio / Description')}</label>
-                                                <Textarea id="diocese-team-bio" name="description" defaultValue={editingItem?.description} required placeholder={t('admin_bio_placeholder', "Courte biographie...")} className="rounded-xl min-h-[100px]" />
+                                                <Textarea id="diocese-team-bio" name="description" defaultValue={editingItem?.description} required placeholder={t('admin_bio_placeholder', "Courte biographie...")} className="rounded-xl min-h-[100px] shadow-sm border-slate-200" />
                                             </div>
                                             <div className="space-y-2">
                                                 <label htmlFor="diocese-team-order" className="text-sm font-bold text-slate-700">{t('admin_order_label', 'Ordre')}</label>
-                                                <Input id="diocese-team-order" name="order" type="number" defaultValue={editingItem?.order || 0} className="rounded-xl h-12" />
+                                                <Input id="diocese-team-order" name="order" type="number" defaultValue={editingItem?.order || 0} className="rounded-xl h-11 shadow-sm border-slate-200" />
                                             </div>
-                                            <div className="space-y-2">
-                                                <label htmlFor="diocese-team-image" className="text-sm font-bold text-slate-700">{t('admin_photo_label', 'Photo de Profil')}</label>
-                                                <div className="flex flex-col gap-3">
-                                                    {editingItem?.image_display && (
-                                                        <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-slate-200 shadow-sm flex-shrink-0">
-                                                            <img src={editingItem.image_display} alt="Photo" className="object-cover w-full h-full bg-slate-50" />
-                                                        </div>
-                                                    )}
-                                                    <Input id="diocese-team-image" name="image" type="file" accept="image/*" className="rounded-xl h-11" />
-                                                </div>
-                                            </div>
+                                            <ImageFieldWithPreview
+                                                id="diocese-team-image"
+                                                name="image"
+                                                label={t('admin_photo_label', 'Photo de Profil')}
+                                                currentImageUrl={editingItem?.image_display}
+                                                aspectRatio="portrait"
+                                            />
                                         </>
                                     )}
 
@@ -383,19 +366,19 @@ const AdminDiocese = () => {
                                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                                 >
                                     {currentTab === "timeline" && (Array.isArray(timeline) ? timeline : (timeline?.results || [])).map((item: any) => (
-                                        <ItemCard key={item.id} title={item.year} subtitle={item.title} content={item.description} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "timeline", id: item.id })} />
+                                        <ItemCard key={item.id} title={item.year} subtitle={item.title} content={item.description} image={item.image_display} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "timeline", id: item.id })} />
                                     ))}
 
                                     {currentTab === "vision" && (Array.isArray(axes) ? axes : (axes?.results || [])).map((item: any) => (
-                                        <ItemCard key={item.id} title={`${t('admin_axe_label', 'Axe')} #${item.order}`} content={item.text} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "axes", id: item.id })} />
+                                        <ItemCard key={item.id} title={`${t('admin_axe_label', 'Axe')} #${item.order}`} content={item.text} image={item.image_display} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "axes", id: item.id })} />
                                     ))}
 
                                     {currentTab === "values" && (Array.isArray(values) ? values : (values?.results || [])).map((item: any) => (
-                                        <ItemCard key={item.id} title={item.title} icon={item.icon} content={item.description} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "values", id: item.id })} />
+                                        <ItemCard key={item.id} title={item.title} icon={item.icon} content={item.description} image={item.image_display} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "values", id: item.id })} />
                                     ))}
 
                                     {currentTab === "team" && (Array.isArray(team) ? team : (team?.results || [])).map((item: any) => (
-                                        <ItemCard key={item.id} title={item.name} subtitle={item.role} content={item.description} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "team", id: item.id })} />
+                                        <ItemCard key={item.id} title={item.name} subtitle={item.role} content={item.description} image={item.image_display} onEdit={() => { setEditingItem(item); setIsAddDialogOpen(true); }} onDelete={() => deleteMutation.mutate({ endpoint: "team", id: item.id })} />
                                     ))}
                                 </motion.div>
                             )}
@@ -407,27 +390,32 @@ const AdminDiocese = () => {
     );
 };
 
-const ItemCard = ({ title, subtitle, content, icon, onEdit, onDelete }: any) => (
+const ItemCard = ({ title, subtitle, content, icon, image, onEdit, onDelete }: any) => (
     <Card className="group rounded-3xl border-slate-200/60 shadow-lg shadow-slate-200/30 hover:shadow-xl hover:shadow-violet-200/20 transition-all duration-300 overflow-hidden bg-white">
-        <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                    {icon && <div className="p-2 bg-violet-50 rounded-lg text-violet-600 font-bold">{icon}</div>}
-                    <div>
-                        <h3 className="font-heading font-bold text-slate-900 leading-tight">{title}</h3>
-                        {subtitle && <p className="text-xs font-bold text-violet-500 uppercase tracking-wider mt-1">{subtitle}</p>}
-                    </div>
+        <div className="relative h-40 w-full bg-slate-100 overflow-hidden">
+            {image ? (
+                <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            ) : (
+                <div className="w-full h-full flex items-center justify-center text-slate-300 opacity-20">
+                    <Library className="h-10 w-10" />
                 </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button variant="ghost" size="icon" onClick={onEdit} className="h-8 w-8 text-slate-400 hover:text-violet-600 rounded-full">
-                        <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={onDelete} className="h-8 w-8 text-slate-400 hover:text-rose-600 rounded-full">
-                        <Trash2 className="h-4 w-4" />
-                    </Button>
-                </div>
+            )}
+            <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button variant="secondary" size="icon" onClick={onEdit} className="h-9 w-9 bg-white/90 backdrop-blur-sm text-slate-700 hover:text-violet-600 rounded-full shadow-lg border border-white/50">
+                    <Edit className="h-4.5 w-4.5" />
+                </Button>
+                <Button variant="secondary" size="icon" onClick={onDelete} className="h-9 w-9 bg-white/90 backdrop-blur-sm text-slate-700 hover:text-rose-600 rounded-full shadow-lg border border-white/50">
+                    <Trash2 className="h-4.5 w-4.5" />
+                </Button>
             </div>
-            <p className="text-sm font-medium text-slate-500 line-clamp-3 font-body leading-relaxed">{content}</p>
+        </div>
+        <CardContent className="p-5">
+            <div className="flex items-center gap-2 mb-2">
+                {icon && <div className="text-violet-500 font-bold">{icon}</div>}
+                <h3 className="font-heading font-bold text-slate-900 leading-tight line-clamp-1">{title}</h3>
+            </div>
+            {subtitle && <p className="text-[10px] font-bold text-violet-500 uppercase tracking-widest mb-2 px-2 py-0.5 bg-violet-50 rounded-full inline-block">{subtitle}</p>}
+            <p className="text-xs font-medium text-slate-500 line-clamp-2 font-body leading-relaxed">{content}</p>
         </CardContent>
     </Card>
 );

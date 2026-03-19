@@ -193,9 +193,7 @@ const AdminSermons = () => {
                                         <label htmlFor="sermon-lang" className="text-sm font-bold text-slate-700">{t('admin_lang_label', 'Langue')}</label>
                                         <select id="sermon-lang" name="language" defaultValue={editingItem?.language || "fr"} className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
                                             <option value="fr">{t('lang_fr', 'Français')}</option>
-                                            <option value="rn">{t('lang_rn', 'Kirundi')}</option>
                                             <option value="en">{t('lang_en', 'Anglais')}</option>
-                                            <option value="sw">{t('lang_sw', 'Swahili')}</option>
                                         </select>
                                     </div>
                                     <div className="space-y-2">

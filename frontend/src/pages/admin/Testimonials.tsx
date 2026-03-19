@@ -188,9 +188,7 @@ const AdminTestimonials = () => {
                                             <label htmlFor="test-lang" className="text-sm font-bold text-slate-700">{t('admin_lang_label', 'Langue')}</label>
                                             <select id="test-lang" name="language" defaultValue={editingItem?.language || "fr"} className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm">
                                                 <option value="fr">{t('lang_fr', 'Français')}</option>
-                                                <option value="rn">{t('lang_rn', 'Kirundi')}</option>
                                                 <option value="en">{t('lang_en', 'Anglais')}</option>
-                                                <option value="sw">{t('lang_sw', 'Swahili')}</option>
                                             </select>
                                         </div>
                                         <div className="space-y-2">
@@ -223,6 +221,8 @@ const AdminTestimonials = () => {
                             <div className="relative w-full md:w-96">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                 <Input
+                                    id="search-testimonials"
+                                    name="search_testimonials"
                                     placeholder={t('admin_search_placeholder', "Rechercher un témoignage...")}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}

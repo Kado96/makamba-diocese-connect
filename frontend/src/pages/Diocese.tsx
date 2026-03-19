@@ -32,6 +32,8 @@ const renderIcon = (iconName: string, props: any) => {
 
 const Diocese = () => {
   const { t, i18n } = useTranslation();
+  const safeLang = i18n.language?.split("-")[0] || "fr";
+
   const { data: settings, isLoading: loadingSettings } = useSiteSettings();
   const { data: presentation, isLoading: loadingPresentation } = useDiocesePresentation();
   const { data: apiTimeline, isLoading: loadingTimeline } = useTimeline();
@@ -42,10 +44,22 @@ const Diocese = () => {
   const isLoading = loadingSettings || loadingPresentation || loadingTimeline || loadingTeam || loadingVision || loadingAxes;
 
   // Ordering Data
-  const timeline = apiTimeline ? [...apiTimeline].sort((a, b) => a.order - b.order) : [];
-  const team = apiTeam ? [...apiTeam].sort((a, b) => a.order - b.order) : [];
-  const visionValues = apiVision ? [...apiVision].sort((a, b) => a.order - b.order) : [];
-  const missionAxes = apiAxes ? [...apiAxes].sort((a, b) => a.order - b.order) : [];
+  // Ordering & Filtering Data by Language
+  const timeline = apiTimeline 
+    ? apiTimeline.filter(item => item.language === safeLang).sort((a, b) => a.order - b.order) 
+    : [];
+    
+  const team = apiTeam 
+    ? apiTeam.filter(item => item.language === safeLang).sort((a, b) => a.order - b.order) 
+    : [];
+    
+  const visionValues = apiVision 
+    ? apiVision.filter(item => item.language === safeLang).sort((a, b) => a.order - b.order) 
+    : [];
+    
+  const missionAxes = apiAxes 
+    ? apiAxes.filter(item => item.language === safeLang).sort((a, b) => a.order - b.order) 
+    : [];
 
   if (isLoading) {
     return (
@@ -90,7 +104,7 @@ const Diocese = () => {
               {t('the_diocese_title_1', 'Le')} <span className="text-transparent bg-clip-text bg-gradient-to-br from-emerald-300 to-green-100 italic">{t('the_diocese_title_2', 'Diocèse')}</span>
             </h1>
             <p className="text-lg md:text-2xl text-white/80 max-w-3xl mx-auto font-light leading-relaxed drop-shadow-md">
-              {settings?.[`diocese_subtitle_${i18n.language}`] || settings?.diocese_subtitle_fr || t('diocese_hero_desc')}
+              {presentation?.[`hero_subtitle_${safeLang}`] || t('diocese_hero_desc')}
             </p>
 
             <motion.a
@@ -136,17 +150,32 @@ const Diocese = () => {
                   <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 tracking-tight leading-tight">{t('origin_org_title', 'Notre Origine &')}<br />{t('organization_title', 'Organisation')}</h2>
                 </div>
 
-                {(presentation?.[`history_text_${i18n.language}`] || presentation?.history_text_fr) && (
-                  <p className="text-lg text-slate-600 font-body leading-relaxed text-justify first-letter:text-6xl first-letter:font-bold first-letter:text-primary first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8]">
-                    {presentation?.[`history_text_${i18n.language}`] || presentation?.history_text_fr}
-                  </p>
+                {(presentation?.[`history_text_${safeLang}`]) && (
+                  <div className="space-y-6">
+                    {presentation.history_image_display && (
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        className="w-full aspect-video rounded-3xl overflow-hidden shadow-2xl border-8 border-white mb-8"
+                      >
+                        <img 
+                          src={presentation.history_image_display} 
+                          alt={t('diocese_history', 'Historique')} 
+                          className="w-full h-full object-cover"
+                        />
+                      </motion.div>
+                    )}
+                    <p className="text-lg text-slate-600 font-body leading-relaxed text-justify first-letter:text-6xl first-letter:font-bold first-letter:text-primary first-letter:mr-3 first-letter:float-left first-letter:leading-[0.8]">
+                      {presentation?.[`history_text_${safeLang}`]}
+                    </p>
+                  </div>
                 )}
 
-                {(presentation?.[`organization_text_${i18n.language}`] || presentation?.organization_text_fr) && (
+                {(presentation?.[`organization_text_${safeLang}`]) && (
                   <div className="mt-8 p-8 bg-slate-50 rounded-3xl border border-slate-100 flex gap-6 items-start">
                     <Network className="h-10 w-10 text-primary flex-shrink-0" />
                     <p className="text-slate-600 leading-relaxed font-body">
-                      {presentation?.[`organization_text_${i18n.language}`] || presentation?.organization_text_fr}
+                      {presentation?.[`organization_text_${safeLang}`]}
                     </p>
                   </div>
                 )}
@@ -191,7 +220,7 @@ const Diocese = () => {
         </section>
 
         {/* SECTION: MOT DE L'EVEQUE */}
-        {(presentation?.[`bishop_message_${i18n.language}`] || presentation?.bishop_message_fr || presentation?.bishop_photo_display) && (
+        {(presentation?.[`bishop_message_${safeLang}`] || presentation?.bishop_message_fr || presentation?.bishop_photo_display) && (
           <section id="bishop" className="py-24 bg-slate-900 border-y border-slate-800 relative overflow-hidden text-slate-100">
             {/* Abstract Background */}
             <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3"></div>
@@ -224,7 +253,7 @@ const Diocese = () => {
                 <div className="flex-1 text-center md:text-left space-y-8">
                   <Quote className="h-16 w-16 text-primary/30 mx-auto md:mx-0" />
                   <blockquote className="text-2xl md:text-3xl lg:text-4xl font-heading font-medium text-white leading-relaxed">
-                    « {presentation?.[`bishop_message_${i18n.language}`] || presentation?.bishop_message_fr || "Notre appel est de servir avec amour et humilité, en portant la lumière de l'Évangile dans chaque foyer de Makamba."} »
+                    « {presentation?.[`bishop_message_${safeLang}`] || t('bishop_message_default')} »
                   </blockquote>
                   <div>
                     <h3 className="text-2xl font-bold font-heading text-primary">
@@ -250,8 +279,8 @@ const Diocese = () => {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-6">{t('vision_title', 'Vision & Mission')}</h2>
-              <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">{settings?.[`vision_subtitle_${i18n.language}`] || settings?.vision_subtitle_fr || t('vision_subtitle_default')}</p>
+              <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-6">{presentation?.[`vision_title_${safeLang}`] || t('vision_title')}</h2>
+              <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">{presentation?.[`vision_description_${safeLang}`] || t('vision_subtitle_default')}</p>
 
             </motion.div>
 

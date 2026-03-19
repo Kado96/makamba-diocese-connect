@@ -37,12 +37,15 @@ def serve_media_with_cors(request, path):
     
     # Vérifier si l'origine est autorisée
     allowed_origins = getattr(django_settings, 'CORS_ALLOWED_ORIGINS', [])
+    allow_all = getattr(django_settings, 'CORS_ALLOW_ALL_ORIGINS', False) or django_settings.DEBUG
+    
+    is_allowed = allow_all or origin in allowed_origins
     
     # Gérer les requêtes OPTIONS (preflight CORS)
     if request.method == 'OPTIONS':
         response = HttpResponse()
-        if origin in allowed_origins:
-            response['Access-Control-Allow-Origin'] = origin
+        if is_allowed:
+            response['Access-Control-Allow-Origin'] = origin if origin else '*'
             response['Access-Control-Allow-Credentials'] = 'true'
             response['Access-Control-Allow-Methods'] = 'GET, HEAD, OPTIONS'
             response['Access-Control-Allow-Headers'] = 'accept, accept-encoding, authorization, content-type, dnt, origin, user-agent, x-csrftoken, x-requested-with'
@@ -55,18 +58,18 @@ def serve_media_with_cors(request, path):
     # Vérifier que le fichier existe et est dans MEDIA_ROOT (sécurité)
     if not os.path.exists(file_path) or not file_path.startswith(str(django_settings.MEDIA_ROOT)):
         response = HttpResponse('File not found', status=404)
-        if origin in allowed_origins:
-            response['Access-Control-Allow-Origin'] = origin
+        if is_allowed:
+            response['Access-Control-Allow-Origin'] = origin if origin else '*'
         return response
     
-    # Servir le fichier avec les headers CORS
+    # Servez le fichier avec les headers CORS
     try:
         file_handle = open(file_path, 'rb')
         response = FileResponse(file_handle)
         
         # Ajouter les headers CORS si l'origine est autorisée
-        if origin in allowed_origins:
-            response['Access-Control-Allow-Origin'] = origin
+        if is_allowed:
+            response['Access-Control-Allow-Origin'] = origin if origin else '*'
             response['Access-Control-Allow-Credentials'] = 'true'
             response['Access-Control-Allow-Methods'] = 'GET, HEAD, OPTIONS'
             response['Access-Control-Allow-Headers'] = 'accept, accept-encoding, authorization, content-type, dnt, origin, user-agent, x-csrftoken, x-requested-with'
@@ -81,8 +84,8 @@ def serve_media_with_cors(request, path):
         return response
     except Exception as e:
         response = HttpResponse(f'Error serving file: {str(e)}', status=500)
-        if origin in allowed_origins:
-            response['Access-Control-Allow-Origin'] = origin
+        if is_allowed:
+            response['Access-Control-Allow-Origin'] = origin if origin else '*'
         return response
 
 router = routers.DefaultRouter()

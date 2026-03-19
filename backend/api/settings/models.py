@@ -187,10 +187,19 @@ class SiteSettings(models.Model):
     section_testimonials_accent_fr = models.CharField(max_length=100, blank=True, default="de nous")
     section_testimonials_desc_fr = models.TextField(blank=True, default="Découvrez comment le Diocese Makamba transforme des vies")
     
-    # Section Vision (multilingue)
-    vision_title_fr = models.CharField(max_length=200, blank=True, default="Notre vision et notre mission")
-    vision_description_fr = models.TextField(blank=True, default="Fondé sur l'Évangile, le Diocèse de Makamba s'engage à servir Dieu et les communautés à travers trois piliers fondamentaux.")
+    diocese_name_fr = models.CharField(max_length=200, blank=True, default="Diocèse de Makamba")
     
+    # Vision Section Title & Description (multilingue)
+    # Français
+    vision_title_fr = models.CharField(max_length=200, blank=True, default="Notre Vision & Mission")
+    vision_description_fr = models.TextField(blank=True, default="Enraciné dans l'Évangile, le Diocèse de Makamba s'engage à servir Dieu et la communauté à travers trois piliers fondamentaux.")
+    # Kirundi
+    vision_title_rn = models.CharField(max_length=200, blank=True, default="Iciyago n'Ubutumwa bwacu")
+    vision_description_rn = models.TextField(blank=True, default="Bishingiye ku Njili, Diyoseze ya Makamba yiyemeje gukorera Imana n'abanyagihugu biciye mu nkingi zitatu z'ibanze.")
+    # English
+    vision_title_en = models.CharField(max_length=200, blank=True, default="Our Vision & Mission")
+    vision_description_en = models.TextField(blank=True, default="Rooted in the Gospel, the Diocese of Makamba is committed to serving God and the community through three fundamental pillars.")
+
     # Piliers Vision (FR)
     vision_pillar1_title_fr = models.CharField(max_length=200, blank=True, default="Foi vivante")
     vision_pillar1_desc_fr = models.TextField(blank=True, default="Une vie sacramentelle riche, ancrée dans la liturgie anglicane et la prière communautaire au quotidien.")
@@ -228,6 +237,7 @@ class SiteSettings(models.Model):
     engage_item3_icon = models.CharField(max_length=50, blank=True, default="BookOpen")
 
     # Section Paroisses (multilingue)
+    parishes_badge_fr = models.CharField(max_length=150, blank=True, default="DÉCOUVRIR LE DIOCÈSE")
     parishes_title_fr = models.CharField(max_length=200, blank=True, default="Nos paroisses")
     parishes_description_fr = models.TextField(blank=True, default="Le diocèse de Makamba compte une vingtaine de paroisses réparties dans toute la province...")
     parishes_map_title_fr = models.CharField(max_length=200, blank=True, default="Province de Makamba")
@@ -235,8 +245,6 @@ class SiteSettings(models.Model):
     parishes_map_stats_fr = models.CharField(max_length=200, blank=True, default="20 paroisses • 8 communes")
     
     # Kirundi
-    vision_title_rn = models.CharField(max_length=200, blank=True, default="Ivyo twiyemeje n’irangamana ryacu")
-    vision_description_rn = models.TextField(blank=True, default="Diyoseze ya Makamba ishingiye ku Njili, yiyemeje gukorera Imana n'abanyagihugu biciye mu nkingi zitatu zishinze.")
     vision_pillar1_title_rn = models.CharField(max_length=200, blank=True, default="Ukwizera kuzima")
     vision_pillar1_desc_rn = models.TextField(blank=True, default="Ubuzima bw'amasakaramentu butunze, bushingiye kuri liturujiya ya Anglikana n'isengesho ry'ishengero rya buri musi.")
     vision_pillar2_title_rn = models.CharField(max_length=200, blank=True, default="Gushinga imizi aho turi")
@@ -256,6 +264,7 @@ class SiteSettings(models.Model):
     engage_item3_desc_rn = models.TextField(blank=True, default="Injira mu mirwi y'isengesho, mu bihe vyo kwisanzura no mu birori.")
     engage_item3_cta_rn = models.CharField(max_length=100, blank=True, default="Raba gahunda")
 
+    parishes_badge_rn = models.CharField(max_length=150, blank=True, default="KUMENYA DIYOSEZE")
     parishes_title_rn = models.CharField(max_length=200, blank=True, default="Ibishengero vyacu")
     parishes_description_rn = models.TextField(blank=True, default="")
     parishes_map_title_rn = models.CharField(max_length=200, blank=True, default="Intara ya Makamba")
@@ -263,8 +272,6 @@ class SiteSettings(models.Model):
     parishes_map_stats_rn = models.CharField(max_length=200, blank=True, default="Ibishengero 20 • Ikomine 8")
 
     # English
-    vision_title_en = models.CharField(max_length=200, blank=True, default="Our Vision and Mission")
-    vision_description_en = models.TextField(blank=True, default="Rooted in the Gospel, the Diocese of Makamba is committed to serving God and communities through three fundamental pillars.")
     vision_pillar1_title_en = models.CharField(max_length=200, blank=True, default="Living Faith")
     vision_pillar1_desc_en = models.TextField(blank=True, default="A rich sacramental life, rooted in Anglican liturgy and daily community prayer.")
     vision_pillar2_title_en = models.CharField(max_length=200, blank=True, default="Local Rooting")
@@ -284,6 +291,7 @@ class SiteSettings(models.Model):
     engage_item3_desc_en = models.TextField(blank=True, default="Join our prayer groups, spiritual retreats, and celebrations.")
     engage_item3_cta_en = models.CharField(max_length=100, blank=True, default="See calendar")
 
+    parishes_badge_en = models.CharField(max_length=150, blank=True, default="DISCOVER THE DIOCESE")
     parishes_title_en = models.CharField(max_length=200, blank=True, default="Our Parishes")
     parishes_description_en = models.TextField(blank=True, default="")
     parishes_map_title_en = models.CharField(max_length=200, blank=True, default="Makamba Province")
@@ -293,6 +301,7 @@ class SiteSettings(models.Model):
     # Swahili
     vision_title_sw = models.CharField(max_length=200, blank=True, default="Maono na Utume Wetu")
     vision_description_sw = models.TextField(blank=True, default="Likizikwa katika Injili, Jimbo la Makamba limejitolea kumtumikia Mungu na jamii kupitia nguzo tatu za msingi.")
+    diocese_subtitle_sw = models.TextField(blank=True, default="")
     vision_pillar1_title_sw = models.CharField(max_length=200, blank=True, default="Imani Hai")
     vision_pillar1_desc_sw = models.TextField(blank=True, default="Maisha tajiri ya kisakramenti, yaliyozikwa katika liturujia ya Kianglikana na sala ya kila siku ya jamii.")
     vision_pillar2_title_sw = models.CharField(max_length=200, blank=True, default="Kushika Mizizi")
@@ -363,6 +372,7 @@ class SiteSettings(models.Model):
     footer_brand_name = models.CharField(max_length=200, blank=True, default="Diocèse de Makamba")
     footer_brand_subtitle = models.CharField(max_length=300, blank=True, default="Église Anglicane du Burundi. Servir Dieu et notre prochain au cœur de Makamba.")
 
+    parishes_badge_sw = models.CharField(max_length=150, blank=True, default="GUNDUA JIMBO")
     parishes_title_sw = models.CharField(max_length=200, blank=True, default="Parokia Zetu")
     parishes_description_sw = models.TextField(blank=True, default="")
     parishes_map_title_sw = models.CharField(max_length=200, blank=True, default="Mkoa wa Makamba")

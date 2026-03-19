@@ -164,7 +164,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # MEDIA
 # ==========================
 
-MEDIA_URL = "/media/"
+MEDIA_URL = "/api/media/"
 
 MEDIA_ROOT = BASE_DIR / "media"
 
@@ -260,3 +260,28 @@ TEMPLATES = [
         },
     },
 ]
+
+# CONFIGURATION LOGS
+import os
+LOGS_DIR = BASE_DIR / "logs"
+if not LOGS_DIR.exists():
+    os.makedirs(LOGS_DIR)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': LOGS_DIR / "error.log",
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}

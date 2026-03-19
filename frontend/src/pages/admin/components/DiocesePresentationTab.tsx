@@ -1,12 +1,13 @@
 import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Save, ImageIcon } from "lucide-react";
+import { Loader2, Save, Info } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
 import { useTranslation } from "react-i18next";
+import ImageFieldWithPreview from "./ImageFieldWithPreview";
 
 const DiocesePresentationTab = () => {
     const { t } = useTranslation();
@@ -59,9 +60,7 @@ const DiocesePresentationTab = () => {
 
     const langs = [
         { code: "fr", label: `🇫🇷 ${t('lang_fr', 'Français')}` },
-        { code: "rn", label: `🇧🇮 ${t('lang_rn', 'Kirundi')}` },
         { code: "en", label: `🇬🇧 ${t('lang_en', 'English')}` },
-        { code: "sw", label: `🇹🇿 ${t('lang_sw', 'Kiswahili')}` },
     ];
 
     if (isLoading) {
@@ -92,27 +91,34 @@ const DiocesePresentationTab = () => {
                 ))}
             </div>
 
-            {/* HERO IMAGE */}
+            {/* HERO SETTINGS */}
             <div className="space-y-6">
                 <div>
-                    <h3 className="text-xl font-heading font-bold text-slate-900 border-b pb-2">{t('admin_photo_label', "Image Principale (Bandeau Hero)")}</h3>
-                    <p className="text-sm text-slate-500 mt-2">{t('admin_hero_image_tip', "L'immense photo qui s'affiche tout en haut de la page Diocese.")}</p>
+                    <h3 className="text-xl font-heading font-bold text-slate-900 border-b pb-2">{t('admin_section_hero', "Entête de la page (Hero)")}</h3>
+                    <p className="text-sm text-slate-500 mt-2">{t('admin_hero_image_tip', "L'immense photo et le texte qui s'affichent tout en haut de la page Diocese.")}</p>
                 </div>
 
                 <div className="space-y-4">
-                    <div className="flex gap-6 items-start flex-col sm:flex-row">
-                        {presentation?.hero_image_display && (
-                            <div className="w-full sm:w-64 h-36 rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50 flex-shrink-0">
-                                <img src={presentation.hero_image_display} alt="Bandeau Hero" className="w-full h-full object-cover" />
-                            </div>
-                        )}
-                        <div className="flex-1 w-full mt-2 space-y-2">
-                            <label htmlFor="hero_image" className="sr-only">{t('admin_hero_image_label', 'Image de fond du Héro')}</label>
-                            <Input id="hero_image" type="file" name="hero_image" accept="image/*" className="rounded-xl h-12 cursor-pointer" />
-                            <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                                <ImageIcon className="h-3 w-3" /> {t('admin_image_tip_high', 'JPG, PNG (Très haute résolution, format paysage)')}
-                            </p>
-                        </div>
+                    <ImageFieldWithPreview
+                        fieldName="hero_image"
+                        label={t('admin_hero_image_label', "Image de fond du Héro")}
+                        currentImageUrl={presentation?.hero_image_display}
+                        hint={t('admin_image_tip_high', 'JPG, PNG (Très haute résolution, format paysage)')}
+                        aspectRatio="21/9"
+                        maxPreviewHeight="200px"
+                    />
+                    
+                    <div className="space-y-2">
+                        <label htmlFor={`hero_subtitle_${activeLang}`} className="text-sm font-bold text-slate-700 cursor-pointer">{t('admin_hero_subtitle_label', "Sous-titre Héro")} ({activeLang})</label>
+                        <Textarea
+                            id={`hero_subtitle_${activeLang}`}
+                            name={`hero_subtitle_${activeLang}`}
+                            key={`hero_subtitle_${activeLang}`}
+                            defaultValue={presentation?.[`hero_subtitle_${activeLang}`] || ""}
+                            rows={3}
+                            className="w-full rounded-2xl min-h-[80px] bg-slate-50/50"
+                            placeholder={t('admin_hero_subtitle_placeholder', "Texte d'accroche sous le titre principal...")}
+                        />
                     </div>
                 </div>
             </div>
@@ -137,21 +143,30 @@ const DiocesePresentationTab = () => {
                     />
                 </div>
 
-                <div className="space-y-4">
-                    <label htmlFor="history_image" className="block text-sm font-bold text-slate-700 cursor-pointer">{t('admin_history_image_label', 'Image Historique')}</label>
-                    <div className="flex gap-6 items-start">
-                        {presentation?.history_image_display && (
-                            <div className="w-40 h-28 rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50 flex-shrink-0">
-                                <img src={presentation.history_image_display} alt={t('admin_tab_history', "Historique")} className="w-full h-full object-cover" />
-                            </div>
-                        )}
-                        <div className="flex-1">
-                            <Input id="history_image" type="file" name="history_image" accept="image/*" className="rounded-xl h-12 cursor-pointer" />
-                            <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                                <ImageIcon className="h-3 w-3" /> {t('admin_image_tip_landscape', 'JPG, PNG (Ratio Paysage recommandé)')}
-                            </p>
-                        </div>
+                <ImageFieldWithPreview
+                    fieldName="history_image"
+                    label={t('admin_history_image_label', 'Image Historique')}
+                    currentImageUrl={presentation?.history_image_display}
+                    hint={t('admin_image_tip_landscape', 'JPG, PNG (Ratio Paysage recommandé)')}
+                    aspectRatio="16/9"
+                    maxPreviewHeight="160px"
+                />
+            </div>
+
+            {/* C H R O N O L O G I E  (TIMELINE) */}
+            <div className="space-y-6 pt-6 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h3 className="text-xl font-heading font-bold text-slate-900 border-b pb-2">{t('admin_tab_history_timeline', "Chronologie Majeure (Dates Clés)")}</h3>
+                        <p className="text-sm text-slate-500 mt-2">{t('admin_timeline_tip', "Gérez les dates importantes (1934, 1960, 2009...) affichées sur le site.")}</p>
                     </div>
+                </div>
+
+                <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100 flex items-center justify-center h-24">
+                    <p className="text-slate-500 font-medium text-sm flex items-center gap-2">
+                        <Info className="h-5 w-5 text-violet-500" />
+                        {t('admin_timeline_managed_below', "Utilisez l'onglet 'Historique' en haut de la page pour ajouter ou modifier ces dates spécifiques.")}
+                    </p>
                 </div>
             </div>
 
@@ -187,22 +202,14 @@ const DiocesePresentationTab = () => {
                     />
                 </div>
 
-                <div className="space-y-4">
-                    <label htmlFor="bishop_photo" className="block text-sm font-bold text-slate-700 cursor-pointer">{t('admin_photo_official_label', 'Photo Officielle')}</label>
-                    <div className="flex gap-6 items-start">
-                        {presentation?.bishop_photo_display && (
-                            <div className="w-32 h-40 rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-50 flex-shrink-0">
-                                <img src={presentation.bishop_photo_display} alt="Évêque" className="w-full h-full object-cover object-top" />
-                            </div>
-                        )}
-                        <div className="flex-1">
-                            <Input id="bishop_photo" type="file" name="bishop_photo" accept="image/*" className="rounded-xl h-12 cursor-pointer" />
-                            <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                                <ImageIcon className="h-3 w-3" /> {t('admin_image_tip_portrait', 'JPG, PNG (Ratio Portrait recommandé)')}
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                <ImageFieldWithPreview
+                    fieldName="bishop_photo"
+                    label={t('admin_photo_official_label', 'Photo Officielle')}
+                    currentImageUrl={presentation?.bishop_photo_display}
+                    hint={t('admin_image_tip_portrait', 'JPG, PNG (Ratio Portrait recommandé)')}
+                    aspectRatio="3/4"
+                    maxPreviewHeight="200px"
+                />
             </div>
 
             {/* O R G A N I S A T I O N */}
@@ -222,6 +229,37 @@ const DiocesePresentationTab = () => {
                         rows={6}
                         className="w-full rounded-2xl min-h-[120px] bg-slate-50/50"
                         placeholder={t('admin_organization_placeholder', "Comment est structuré le diocèse, ses entités clés...")}
+                    />
+                </div>
+            </div>
+
+            {/* V I S I O N  &  M I S S I O N */}
+            <div className="space-y-6 pt-6 border-t border-slate-100">
+                <div>
+                    <h3 className="text-xl font-heading font-bold text-slate-900 border-b pb-2">{t('vision_title', "Vision & Mission")}</h3>
+                    <p className="text-sm text-slate-500 mt-2">{t('admin_vision_tip', "Gérez le titre et la description de la section Vision.")}</p>
+                </div>
+
+                <div className="space-y-2">
+                    <label htmlFor={`vision_title_${activeLang}`} className="text-sm font-bold text-slate-700 cursor-pointer">{t('admin_vision_title', "Titre de la Vision")} ({activeLang})</label>
+                    <Input
+                        id={`vision_title_${activeLang}`}
+                        name={`vision_title_${activeLang}`}
+                        key={`vision_title_${activeLang}`}
+                        defaultValue={presentation?.[`vision_title_${activeLang}`] || ""}
+                        className="rounded-xl h-12 bg-slate-50/50"
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <label htmlFor={`vision_description_${activeLang}`} className="text-sm font-bold text-slate-700 cursor-pointer">{t('admin_vision_desc', "Description de la Vision")} ({activeLang})</label>
+                    <Textarea
+                        id={`vision_description_${activeLang}`}
+                        name={`vision_description_${activeLang}`}
+                        key={`vision_description_${activeLang}`}
+                        defaultValue={presentation?.[`vision_description_${activeLang}`] || ""}
+                        rows={4}
+                        className="w-full rounded-2xl min-h-[100px] bg-slate-50/50"
                     />
                 </div>
             </div>

@@ -1,8 +1,9 @@
 import React from "react";
-import { Globe, Image as ImageIcon } from "lucide-react";
+import { Globe } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "react-i18next";
+import ImageFieldWithPreview from "./ImageFieldWithPreview";
 
 interface LanguageTabContentProps {
     lang: string;
@@ -21,35 +22,15 @@ const LanguageTabContent = React.memo(({ lang, settings }: LanguageTabContentPro
 
                 {/* Hero Image - Only on French tab for simplicity since it's a singleton */}
                 {lang === "fr" && (
-                    <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 mb-6 space-y-4">
-                        <label htmlFor="hero_image" className="text-sm font-bold text-blue-900 flex items-center gap-2">
-                            <ImageIcon className="h-4 w-4" /> {t('admin_hero_image_label', "Image de fond (Héro)")}
-                        </label>
-
-                        {settings?.hero_image_display && (
-                            <div className="relative aspect-[21/9] w-full max-h-[150px] overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
-                                <img
-                                    src={settings.hero_image_display}
-                                    className="w-full h-full object-cover"
-                                    alt="Hero Preview"
-                                />
-                                <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                    <ImageIcon className="text-white h-8 w-8" />
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="space-y-2">
-                            <Input
-                                id="hero_image"
-                                type="file"
-                                name="hero_image"
-                                className="rounded-xl border-slate-200"
-                            />
-                            <p className="text-xs text-slate-400 italic">
-                                {t('admin_hero_image_tip_global', "Format suggéré : 1920x1080px. Cette image sera affichée pour toutes les langues.")}
-                            </p>
-                        </div>
+                    <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 mb-6">
+                        <ImageFieldWithPreview
+                            fieldName="hero_image"
+                            label={t('admin_hero_image_label', "Image de fond du Héro")}
+                            currentImageUrl={settings?.hero_image_display}
+                            hint={t('admin_hero_image_tip_global', "Format suggéré : 1920x1080px. Cette image sera affichée pour toutes les langues.")}
+                            aspectRatio="21/9"
+                            maxPreviewHeight="180px"
+                        />
                     </div>
                 )}
 
@@ -265,56 +246,7 @@ const LanguageTabContent = React.memo(({ lang, settings }: LanguageTabContentPro
                 </div>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-slate-100">
-                <h3 className="font-bold text-lg text-slate-800 border-b pb-2">{t('admin_parishes', "Paroisses")}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <label htmlFor={`parishes_title_${lang}`} className="text-sm font-bold text-slate-700">{t('admin_title_section', "Titre Section")}</label>
-                        <Input
-                            id={`parishes_title_${lang}`}
-                            name={`parishes_title_${lang}`}
-                            defaultValue={settings?.[`parishes_title_${lang}`]}
-                            className="rounded-xl border-slate-200 h-10"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label htmlFor={`parishes_description_${lang}`} className="text-sm font-bold text-slate-700">{t('admin_desc_label', "Description")}</label>
-                        <Textarea
-                            id={`parishes_description_${lang}`}
-                            name={`parishes_description_${lang}`}
-                            defaultValue={settings?.[`parishes_description_${lang}`]}
-                            className="rounded-xl border-slate-200 min-h-[80px]"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label htmlFor={`parishes_map_title_${lang}`} className="text-sm font-bold text-slate-700">{t('admin_map_title', "Titre Carte")}</label>
-                        <Input
-                            id={`parishes_map_title_${lang}`}
-                            name={`parishes_map_title_${lang}`}
-                            defaultValue={settings?.[`parishes_map_title_${lang}`]}
-                            className="rounded-xl border-slate-200 h-10"
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <label htmlFor={`parishes_map_subtitle_${lang}`} className="text-sm font-bold text-slate-700">{t('admin_map_subtitle', "Sous-titre Carte")}</label>
-                        <Input
-                            id={`parishes_map_subtitle_${lang}`}
-                            name={`parishes_map_subtitle_${lang}`}
-                            defaultValue={settings?.[`parishes_map_subtitle_${lang}`]}
-                            className="rounded-xl border-slate-200 h-10"
-                        />
-                    </div>
-                    <div className="space-y-2 col-span-full">
-                        <label htmlFor={`parishes_map_stats_${lang}`} className="text-sm font-bold text-slate-700">{t('admin_map_stats', "Stats Carte")}</label>
-                        <Input
-                            id={`parishes_map_stats_${lang}`}
-                            name={`parishes_map_stats_${lang}`}
-                            defaultValue={settings?.[`parishes_map_stats_${lang}`]}
-                            className="rounded-xl border-slate-200 h-10"
-                        />
-                    </div>
-                </div>
-            </div>
+
 
             <div className="space-y-4 pt-4 border-t border-slate-100">
                 <h3 className="font-bold text-lg text-slate-800 border-b pb-2 flex items-center gap-2">

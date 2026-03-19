@@ -115,7 +115,7 @@ export function useSiteSettings() {
             if (!data) throw new Error('Could not fetch site settings');
             return data;
         },
-        staleTime: 30 * 1000, // 30 seconds
+        staleTime: 1000, // 1 second - pour une mise à jour instantanée après modification en admin
     });
 }
 
@@ -163,7 +163,7 @@ export function useTimeline() {
             const data = await fetchTimeline(lang);
             return data ?? [];
         },
-        staleTime: 60 * 60 * 1000,
+        staleTime: 1000, // 1 second - pour mise à jour immédiate
     });
 }
 
@@ -179,7 +179,7 @@ export function useMissionAxes() {
             const data = await fetchMissionAxes(lang);
             return data ?? [];
         },
-        staleTime: 60 * 60 * 1000,
+        staleTime: 1000, // 1 second - pour mise à jour immédiate
     });
 }
 
@@ -195,7 +195,7 @@ export function useVisionValues() {
             const data = await fetchVisionValues(lang);
             return data ?? [];
         },
-        staleTime: 60 * 60 * 1000,
+        staleTime: 1000, // 1 second - pour mise à jour immédiate
     });
 }
 
@@ -211,7 +211,7 @@ export function useTeamMembers() {
             const data = await fetchTeamMembers(lang);
             return data ?? [];
         },
-        staleTime: 60 * 60 * 1000,
+        staleTime: 1000, // 1 second - pour mise à jour immédiate
     });
 }
 
@@ -226,7 +226,7 @@ export function useDiocesePresentation() {
         queryFn: async () => {
             return await fetchDiocesePresentation(lang);
         },
-        staleTime: 60 * 60 * 1000,
+        staleTime: 1000, // 1 second - pour mise à jour immédiate
     });
 }
 

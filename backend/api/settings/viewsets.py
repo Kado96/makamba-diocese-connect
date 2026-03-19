@@ -41,14 +41,14 @@ class SiteSettingsCurrentView(APIView):
                 try:
                     settings = SiteSettings.objects.create(
                         pk=1,
-                        site_name='Shalom Ministry',
-                        description='Plateforme de formation chrétienne en ligne',
-                        contact_email='contact@shalomministry.org',
-                        contact_phone='+257 79 000 000',
-                        contact_address='Bujumbura, Burundi',
-                        hero_title_fr='Grandissez dans la foi',
-                        hero_subtitle_fr='Découvrez nos émissions, enseignements et temps de méditation pour approfondir votre relation avec Dieu.',
-                        about_content_fr='Bienvenue sur Shalom Ministry, une plateforme dédiée à la croissance spirituelle.',
+                        site_name='Diocese Makamba',
+                        description='Site officiel du Diocese Makamba Connect',
+                        contact_email='info@makamba-diocese.org',
+                        contact_phone='+257 22 23 45 67',
+                        contact_address='Makamba, Burundi',
+                        hero_title_fr='Diocèse de Makamba',
+                        hero_subtitle_fr='Servir Dieu et notre prochain au cœur de Makamba.',
+                        about_content_fr='Bienvenue sur le site du Diocese Makamba, une communauté dédiée à la croissance spirituelle.',
                         contact_content_fr='Contactez-nous pour toute question ou demande.',
                     )
                     logger.info(f"Instance SiteSettings créée (ID: {settings.id})")
@@ -162,14 +162,14 @@ class SiteSettingsViewSet(viewsets.ModelViewSet):
             except SiteSettings.DoesNotExist:
                 settings = SiteSettings.objects.create(
                     pk=1,
-                    site_name='Shalom Ministry',
-                    description='Plateforme de formation chrétienne en ligne',
-                    contact_email='contact@shalomministry.org',
-                    contact_phone='+257 79 000 000',
-                    contact_address='Bujumbura, Burundi',
-                    hero_title_fr='Grandissez dans la foi',
-                    hero_subtitle_fr='Découvrez nos émissions, enseignements et temps de méditation pour approfondir votre relation avec Dieu.',
-                    about_content_fr='Bienvenue sur Shalom Ministry, une plateforme dédiée à la croissance spirituelle.',
+                    site_name='Diocese Makamba',
+                    description='Site officiel du Diocese Makamba Connect',
+                    contact_email='info@makamba-diocese.org',
+                    contact_phone='+257 22 23 45 67',
+                    contact_address='Makamba, Burundi',
+                    hero_title_fr='Diocèse de Makamba',
+                    hero_subtitle_fr='Servir Dieu et notre prochain au cœur de Makamba.',
+                    about_content_fr='Bienvenue sur le site du Diocese Makamba, une communauté dédiée à la croissance spirituelle.',
                     contact_content_fr='Contactez-nous pour toute question ou demande.',
                 )
             
@@ -220,14 +220,14 @@ class SiteSettingsViewSet(viewsets.ModelViewSet):
                 settings, created = SiteSettings.objects.get_or_create(
                     pk=1,
                     defaults={
-                        'site_name': 'Shalom Ministry',
-                        'description': 'Plateforme de formation chrétienne en ligne',
-                        'contact_email': 'contact@shalomministry.org',
-                        'contact_phone': '+257 79 000 000',
-                        'contact_address': 'Bujumbura, Burundi',
-                        'hero_title_fr': 'Grandissez dans la foi',
-                        'hero_subtitle_fr': 'Découvrez nos émissions, enseignements et temps de méditation pour approfondir votre relation avec Dieu.',
-                        'about_content_fr': 'Bienvenue sur Shalom Ministry, une plateforme dédiée à la croissance spirituelle.',
+                        'site_name': 'Diocese Makamba',
+                        'description': 'Site officiel du Diocese Makamba Connect',
+                        'contact_email': 'info@makamba-diocese.org',
+                        'contact_phone': '+257 22 23 45 67',
+                        'contact_address': 'Makamba, Burundi',
+                        'hero_title_fr': 'Diocèse de Makamba',
+                        'hero_subtitle_fr': 'Servir Dieu et notre prochain au cœur de Makamba.',
+                        'about_content_fr': 'Bienvenue sur le site du Diocese Makamba, une communauté dédiée à la croissance spirituelle.',
                         'contact_content_fr': 'Contactez-nous pour toute question ou demande.',
                     }
                 )
@@ -252,7 +252,24 @@ class SiteSettingsViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         """Mettre à jour l'instance unique"""
         settings = SiteSettings.get_settings()
-        serializer = self.get_serializer(settings, data=request.data, partial=kwargs.get('partial', False), context={'request': request})
+        
+        # Construire un dict mutable SANS deepcopy (qui plante avec les fichiers uploadés)
+        mutable_data = {}
+        for key in request.data:
+            # Pour les fichiers, prendre directement l'objet fichier
+            if key in request.FILES:
+                mutable_data[key] = request.FILES[key]
+            else:
+                mutable_data[key] = request.data[key]
+        
+        # Gérer la suppression explicite du logo
+        if mutable_data.get('clear_logo') == 'true' or mutable_data.get('clear_logo') is True:
+            settings.logo = None
+            settings.save()
+            # Retrait du champ pour éviter que le serializer n'essaie de le traiter
+            mutable_data.pop('logo', None)
+                
+        serializer = self.get_serializer(settings, data=mutable_data, partial=kwargs.get('partial', False), context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
@@ -266,8 +283,7 @@ class SiteSettingsViewSet(viewsets.ModelViewSet):
     def current(self, request):
         """Action personnalisée pour récupérer l'objet unique directement (sans liste)"""
         try:
-            # Désactiver la pagination pour cette action
-            self.paginator = None
+            # Récupérer l'instance unique
             
             # Utiliser get_settings() qui gère automatiquement la création si nécessaire
             settings = SiteSettings.get_settings()
@@ -277,14 +293,14 @@ class SiteSettingsViewSet(viewsets.ModelViewSet):
                 # Si get_settings() retourne None, créer l'instance
                 settings = SiteSettings.objects.create(
                     pk=1,
-                    site_name='Shalom Ministry',
-                    description='Plateforme de formation chrétienne en ligne',
-                    contact_email='contact@shalomministry.org',
-                    contact_phone='+257 79 000 000',
-                    contact_address='Bujumbura, Burundi',
-                    hero_title_fr='Grandissez dans la foi',
-                    hero_subtitle_fr='Découvrez nos émissions, enseignements et temps de méditation pour approfondir votre relation avec Dieu.',
-                    about_content_fr='Bienvenue sur Shalom Ministry, une plateforme dédiée à la croissance spirituelle.',
+                    site_name='Diocese Makamba',
+                    description='Site officiel du Diocese Makamba Connect',
+                    contact_email='info@makamba-diocese.org',
+                    contact_phone='+257 22 23 45 67',
+                    contact_address='Makamba, Burundi',
+                    hero_title_fr='Diocèse de Makamba',
+                    hero_subtitle_fr='Servir Dieu et notre prochain au cœur de Makamba.',
+                    about_content_fr='Bienvenue sur le site du Diocese Makamba, une communauté dédiée à la croissance spirituelle.',
                     contact_content_fr='Contactez-nous pour toute question ou demande.',
                 )
             
@@ -299,14 +315,14 @@ class SiteSettingsViewSet(viewsets.ModelViewSet):
             try:
                 settings = SiteSettings.objects.create(
                     pk=1,
-                    site_name='Shalom Ministry',
-                    description='Plateforme de formation chrétienne en ligne',
-                    contact_email='contact@shalomministry.org',
-                    contact_phone='+257 79 000 000',
-                    contact_address='Bujumbura, Burundi',
-                    hero_title_fr='Grandissez dans la foi',
-                    hero_subtitle_fr='Découvrez nos émissions, enseignements et temps de méditation pour approfondir votre relation avec Dieu.',
-                    about_content_fr='Bienvenue sur Shalom Ministry, une plateforme dédiée à la croissance spirituelle.',
+                    site_name='Diocese Makamba',
+                    description='Site officiel du Diocese Makamba Connect',
+                    contact_email='info@makamba-diocese.org',
+                    contact_phone='+257 22 23 45 67',
+                    contact_address='Makamba, Burundi',
+                    hero_title_fr='Diocèse de Makamba',
+                    hero_subtitle_fr='Servir Dieu et notre prochain au cœur de Makamba.',
+                    about_content_fr='Bienvenue sur le site du Diocese Makamba, une communauté dédiée à la croissance spirituelle.',
                     contact_content_fr='Contactez-nous pour toute question ou demande.',
                 )
                 serializer = self.get_serializer(settings, context={'request': request})

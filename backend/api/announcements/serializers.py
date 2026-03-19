@@ -9,9 +9,6 @@ class AnnouncementImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'image_url', 'caption', 'order']
 
     def get_image_url(self, obj):
-        request = self.context.get('request')
-        if obj.image and request:
-            return request.build_absolute_uri(obj.image.url)
         return obj.image.url if obj.image else None
 
 class AnnouncementSerializer(serializers.ModelSerializer):
@@ -24,9 +21,4 @@ class AnnouncementSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_image_display(self, obj):
-        if not obj.image:
-            return None
-        request = self.context.get('request')
-        if request:
-            return request.build_absolute_uri(obj.image.url)
-        return obj.image.url
+        return obj.image.url if obj.image else None

@@ -206,9 +206,7 @@ const AdminHomepage = () => {
 
     const langs = [
         { code: "fr", label: `🇫🇷 ${t('lang_fr', 'Français')}` },
-        { code: "rn", label: `🇧🇮 ${t('lang_rn', 'Kirundi')}` },
         { code: "en", label: `🇬🇧 ${t('lang_en', 'English')}` },
-        { code: "sw", label: `🇹🇿 ${t('lang_sw', 'Kiswahili')}` },
     ];
 
     return (

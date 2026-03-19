@@ -8,7 +8,8 @@ import {
     Globe,
     Mail,
     Activity,
-    Fingerprint
+    Fingerprint,
+    MapPin
 } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import {
@@ -29,6 +30,7 @@ import StatsTabContent from "./components/StatsTabContent";
 import ContactTabContent from "./components/ContactTabContent";
 import { useTranslation } from "react-i18next";
 import IdentityTabContent from "./components/IdentityTabContent";
+import ParishesTabContent from "./components/ParishesTabContent";
 
 const AdminSettings = () => {
     const { t } = useTranslation();
@@ -148,21 +150,22 @@ const AdminSettings = () => {
                                 <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                                     <TabsList className="bg-slate-100 p-1 rounded-xl mb-6 flex flex-wrap h-auto">
                                         <TabsTrigger value="fr" className="rounded-lg font-bold">🇫🇷 {t('lang_fr', 'Français')}</TabsTrigger>
-                                        <TabsTrigger value="rn" className="rounded-lg font-bold">🇧🇮 {t('lang_rn', 'Kirundi')}</TabsTrigger>
                                         <TabsTrigger value="en" className="rounded-lg font-bold">🇬🇧 {t('lang_en', 'English')}</TabsTrigger>
-                                        <TabsTrigger value="sw" className="rounded-lg font-bold">🇹🇿 {t('lang_sw', 'Swahili')}</TabsTrigger>
                                         <TabsTrigger value="identity" className="rounded-lg font-bold">
                                             <Fingerprint className="h-4 w-4 mr-2 text-indigo-500" /> {t('admin_identity', 'Identité')}
                                         </TabsTrigger>
                                         <TabsTrigger value="stats" className="rounded-lg font-bold">
                                             <Activity className="h-4 w-4 mr-2" /> {t('admin_stats', 'Statistiques')}
                                         </TabsTrigger>
-                                        <TabsTrigger value="contact" className="rounded-lg font-bold ml-auto bg-emerald-50 text-emerald-700 data-[state=active]:bg-emerald-600 data-[state=active]:text-white">
+                                        <TabsTrigger value="parishes" className="rounded-lg font-bold bg-emerald-50 text-emerald-700 data-[state=active]:bg-emerald-600 data-[state=active]:text-white">
+                                            <MapPin className="h-4 w-4 mr-2" /> {t('admin_parishes', 'Paroisses')}
+                                        </TabsTrigger>
+                                        <TabsTrigger value="contact" className="rounded-lg font-bold ml-auto bg-blue-50 text-blue-700 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                                             <Mail className="h-4 w-4 mr-2" /> {t('admin_contact_social', 'Contact & Social')}
                                         </TabsTrigger>
                                     </TabsList>
 
-                                    {["fr", "rn", "en", "sw"].map((lang) => (
+                                    {["fr", "en"].map((lang) => (
                                         <TabsContent key={lang} value={lang} className="mt-0">
                                             <LanguageTabContent lang={lang} settings={settings} />
                                         </TabsContent>
@@ -178,6 +181,10 @@ const AdminSettings = () => {
 
                                     <TabsContent value="identity" className="mt-0">
                                         <IdentityTabContent settings={settings} />
+                                    </TabsContent>
+
+                                    <TabsContent value="parishes" className="mt-0">
+                                        <ParishesTabContent settings={settings} />
                                     </TabsContent>
                                 </Tabs>
                             </CardContent>

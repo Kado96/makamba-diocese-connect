@@ -42,7 +42,6 @@ const Dashboard = () => {
         { label: t('admin_new_sermon', "Nouveau Sermon"), icon: Plus, color: "bg-blue-600", hover: "hover:bg-blue-700", path: "/admin/sermons" },
         ...(isAdmin ? [{ label: t('admin_add_pastor', "Ajouter Pasteur"), icon: Users, color: "bg-emerald-600", hover: "hover:bg-emerald-700", path: "/admin/users/add" }] : []),
         { label: t('admin_view_site', "Voir le Site"), icon: ExternalLink, iconSize: 20, color: "bg-orange-500", hover: "hover:bg-orange-600", path: "/", external: true },
-        ...(isAdmin ? [{ label: t('admin_messages', "Messages"), icon: MessageSquare, color: "bg-purple-500", hover: "hover:bg-purple-600", path: "/admin/testimonials" }] : []),
     ];
 
     return (

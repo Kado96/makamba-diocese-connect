@@ -18,11 +18,7 @@ class TimelineEventSerializer(serializers.ModelSerializer):
         if not image_field or not hasattr(image_field, 'url'):
             return None
         try:
-            url = image_field.url
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(url)
-            return url
+            return image_field.url
         except Exception:
             return None
 
@@ -43,11 +39,7 @@ class MissionAxeSerializer(serializers.ModelSerializer):
         if not image_field or not hasattr(image_field, 'url'):
             return None
         try:
-            url = image_field.url
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(url)
-            return url
+            return image_field.url
         except Exception:
             return None
 
@@ -68,11 +60,7 @@ class VisionValueSerializer(serializers.ModelSerializer):
         if not image_field or not hasattr(image_field, 'url'):
             return None
         try:
-            url = image_field.url
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(url)
-            return url
+            return image_field.url
         except Exception:
             return None
 
@@ -93,11 +81,7 @@ class TeamMemberSerializer(serializers.ModelSerializer):
         if not image_field or not hasattr(image_field, 'url'):
             return None
         try:
-            url = image_field.url
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(url)
-            return url
+            return image_field.url
         except Exception:
             return None
 
@@ -114,7 +98,8 @@ class DiocesePresentationSerializer(serializers.ModelSerializer):
     class Meta:
         model = DiocesePresentation
         fields = [
-            'id', 'hero_image_display', 'history_image_display', 'bishop_photo_display',
+            'id', 'hero_image', 'history_image', 'bishop_photo',
+            'hero_image_display', 'history_image_display', 'bishop_photo_display',
             'bishop_name', 'history_text', 'bishop_message', 'organization_text',
             # Include raw fields just in case
             'history_text_fr', 'history_text_rn', 'history_text_en', 'history_text_sw',
@@ -159,10 +144,6 @@ class DiocesePresentationSerializer(serializers.ModelSerializer):
         if not image_field or not hasattr(image_field, 'url'):
             return None
         try:
-            url = image_field.url
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(url)
-            return url
+            return image_field.url
         except Exception:
             return None

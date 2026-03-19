@@ -190,8 +190,6 @@ const AdminParishes = () => {
                                             <label htmlFor="parish-language" className="text-sm font-bold text-slate-700">{t('admin_lang_label', 'Langue')}</label>
                                             <select id="parish-language" name="language" defaultValue={editingItem?.language || "fr"} className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background disabled:cursor-not-allowed disabled:opacity-50">
                                                 <option value="fr">{t('lang_fr', 'Français')}</option>
-                                                <option value="rn">{t('lang_rn', 'Kirundi')}</option>
-                                                <option value="sw">{t('lang_sw', 'Kiswahili')}</option>
                                                 <option value="en">{t('lang_en', 'English')}</option>
                                             </select>
                                         </div>

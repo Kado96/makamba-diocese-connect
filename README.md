@@ -184,10 +184,63 @@ Pour que les navigateurs (Chrome, Safari, etc.) puissent remplir automatiquement
 />
 ```
 
-### 6. Pourquoi c'est mieux que `dumpdata` ?
+### 7. Pourquoi c'est mieux que `dumpdata` ?
 - **Pas d'écrasement total** : Contrairement à `loaddata`, le script local `sync_local_to_prod` ne supprime rien en production. Il fusionne les données de manière bidirectionnelle avec des clés naturelles.
 - **Sécurité** : Si une erreur survient au milieu, la transaction `transaction.atomic` annule tout pour éviter une base de données corrompue.
 - **Liberté** : Vous pouvez modifier un texte en local et l'envoyer en production en 2 secondes sans toucher au code ni ouvrir PgAdmin.
 
+## ⚠️ Mise en garde cruciale pour la Production (Render)
+
+### 1. Le Piège du Disque Éphémère
+Si vous hébergez votre site sur **Render** (version gratuite ou standard sans disque persistant) :
+- **Tout ce que vous uploadez via l'admin** (Logo, Photos, etc.) sera **EFFACÉ** à chaque redémarrage du serveur (toutes les 24h environ).
+- **Solution de secours :** Utilisez des liens directs vers des images hébergées ailleurs (Google Drive, ImgBB, etc.).
+- **Solution Pro :** Configurez **Supabase Storage** (voir section ci-dessous).
+
+### 2. Le Cas des Vidéos 🎥
+**NE JAMAIS héberger vos vidéos directement sur Render ou Supabase Storage.**
+- Les fichiers vidéos sont trop lourds et ralentiront votre site.
+- **Meilleure Pratique :** Hébergez vos vidéos sur **YouTube** (ou Vimeo) en mode "Non répertorié" et mettez le lien dans l'administration. C'est gratuit et ultra rapide.
+
 ---
-© 2026 Diocèse de Makamba - Église Anglicane du Burundi.
+
+## ☁️ Configuration du Stockage d'Images (Supabase Storage)
+
+Si vous voulez que vos photos (Logo, Hero, Photos d'Évêque) apparaissent sur le site en ligne et ne soient plus liées à votre ordinateur, suivez ce guide.
+
+### 1. Préparer Supabase
+1. Allez sur votre tableau de bord [Supabase](https://supabase.com).
+2. Dans le menu de gauche, allez dans **Storage**.
+3. Créez un nouveau bucket (dossier) nommé **`media`** et mettez-le en **Public**.
+4. Allez dans **Project Settings** > **Storage**.
+5. Notez vos identifiants dans la section **S3 Connection Settings** :
+   - `S3 Endpoint`
+   - `Access Key ID`
+   - `Secret Access Key`
+
+### 2. Installer les outils (Backend)
+Dans votre terminal `backend` :
+```powershell
+.\venv\Scripts\activate
+pip install django-storages boto3
+pip freeze > requirements.txt
+```
+
+### 3. Configurer le projet (`backend/.env`)
+Ajoutez ces lignes à votre fichier `.env` :
+```env
+USE_S3_STORAGE=True
+AWS_ACCESS_KEY_ID=votre_access_key_id
+AWS_SECRET_ACCESS_KEY=votre_secret_access_key
+AWS_STORAGE_BUCKET_NAME=media
+AWS_S3_ENDPOINT_URL=votre_s3_endpoint_url
+AWS_S3_REGION_NAME=votre_region (ex: eu-central-1)
+```
+
+### 4. Pourquoi faire ça ?
+- **Stabilité** : Vos photos ne disparaissent plus.
+- **Vitesse** : Les images sont servies par le réseau mondial de Supabase.
+- **Synchronisation** : Tout ce que vous uploadez en local apparaît immédiatement sur le site réel.
+
+---
+© 2024-2026 Diocèse de Makamba - Église Anglicane du Burundi.

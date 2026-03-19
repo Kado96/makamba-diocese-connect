@@ -90,24 +90,41 @@ class DiocesePresentation(models.Model):
     hero_image = models.ImageField(upload_to='diocese/', blank=True, null=True, verbose_name="Image Hero (Bandeau)")
     
     # French
+    hero_subtitle_fr = models.TextField(verbose_name="Sous-titre Héro (FR)", blank=True, null=True, default="L'Église Anglicane du Diocèse de Makamba, fondée en 2009, est un pilier spirituel et social de la province du Burundi.")
     history_text_fr = models.TextField(verbose_name="Texte de l'historique (FR)", blank=True, null=True)
     bishop_message_fr = models.TextField(verbose_name="Message de l'évêque (FR)", blank=True, null=True)
     organization_text_fr = models.TextField(verbose_name="Texte sur l'organisation (FR)", blank=True, null=True)
     
     # Kirundi
+    hero_subtitle_rn = models.TextField(verbose_name="Sous-titre Héro (RN)", blank=True, null=True)
     history_text_rn = models.TextField(verbose_name="Texte de l'historique (RN)", blank=True, null=True)
     bishop_message_rn = models.TextField(verbose_name="Message de l'évêque (RN)", blank=True, null=True)
     organization_text_rn = models.TextField(verbose_name="Texte sur l'organisation (RN)", blank=True, null=True)
     
     # English
+    hero_subtitle_en = models.TextField(verbose_name="Sous-titre Héro (EN)", blank=True, null=True, default="The Anglican Church of Makamba Diocese, founded in 2009, is a spiritual and social pillar of the province.")
     history_text_en = models.TextField(verbose_name="Texte de l'historique (EN)", blank=True, null=True)
     bishop_message_en = models.TextField(verbose_name="Message de l'évêque (EN)", blank=True, null=True)
     organization_text_en = models.TextField(verbose_name="Texte sur l'organisation (EN)", blank=True, null=True)
     
     # Swahili
+    hero_subtitle_sw = models.TextField(verbose_name="Sous-titre Héro (SW)", blank=True, null=True)
     history_text_sw = models.TextField(verbose_name="Texte de l'historique (SW)", blank=True, null=True)
     bishop_message_sw = models.TextField(verbose_name="Message de l'évêque (SW)", blank=True, null=True)
     organization_text_sw = models.TextField(verbose_name="Texte sur l'organisation (SW)", blank=True, null=True)
+
+    # Mission & Vision Global (Multilingual)
+    vision_title_fr = models.CharField(max_length=255, verbose_name="Titre Vision (FR)", blank=True, null=True, default="Notre vision et notre mission")
+    vision_description_fr = models.TextField(verbose_name="Description Vision (FR)", blank=True, null=True, default="Fondé sur l'Évangile, le Diocèse de Makamba s'engage à servir Dieu et les communautés à travers trois piliers fondamentaux.")
+    
+    vision_title_rn = models.CharField(max_length=255, verbose_name="Titre Vision (RN)", blank=True, null=True)
+    vision_description_rn = models.TextField(verbose_name="Description Vision (RN)", blank=True, null=True)
+    
+    vision_title_en = models.CharField(max_length=255, verbose_name="Titre Vision (EN)", blank=True, null=True, default="Our Vision and Mission")
+    vision_description_en = models.TextField(verbose_name="Description Vision (EN)", blank=True, null=True, default="Rooted in the Gospel, the Diocese of Makamba is committed to serving God and communities through three fundamental pillars.")
+    
+    vision_title_sw = models.CharField(max_length=255, verbose_name="Titre Vision (SW)", blank=True, null=True)
+    vision_description_sw = models.TextField(verbose_name="Description Vision (SW)", blank=True, null=True)
 
     history_image = models.ImageField(upload_to='diocese/', blank=True, null=True, verbose_name="Image de l'historique")
     bishop_name = models.CharField(max_length=255, verbose_name="Nom de l'évêque", blank=True, null=True)

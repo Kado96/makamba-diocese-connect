@@ -24,8 +24,6 @@ const navItems = [
 
 const languages = [
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'rn', name: 'Kirundi', flag: '🇧🇮' },
-  { code: 'sw', name: 'Kiswahili', flag: '🇹🇿' },
   { code: 'en', name: 'English', flag: '🇺🇸' },
 ];
 
@@ -64,15 +62,32 @@ const Header = () => {
       } border-b border-white/10`}>
       <div className="container mx-auto flex items-center justify-between px-6 lg:px-12">
         {/* 🏛️ Logo & Branding */}
-        <Link to="/" className="flex items-center gap-4 group">
+        <Link to="/" className="flex items-center gap-6 group" style={{ perspective: "1200px" }}>
           <motion.div
-            whileHover={{ rotate: 15, scale: 1.1 }}
-            className="p-2.5 bg-primary/10 rounded-2xl group-hover:bg-primary transition-all duration-500 shadow-lg shadow-primary/5 min-w-[50px] min-h-[50px] flex items-center justify-center overflow-hidden"
+            animate={{ 
+              rotateY: [0, 360],
+              width: scrolled ? (window.innerWidth < 640 ? 64 : 80) : (window.innerWidth < 640 ? 96 : 128),
+              height: scrolled ? (window.innerWidth < 640 ? 64 : 80) : (window.innerWidth < 640 ? 96 : 128),
+            }}
+            transition={{ 
+              rotateY: { repeat: Infinity, duration: 0.8, repeatDelay: 5, ease: "easeInOut" },
+              width: { duration: 0.5 },
+              height: { duration: 0.5 }
+            }}
+            whileHover={{ scale: 1.05 }}
+            className={`bg-white rounded-full shadow-2xl flex items-center justify-center border-white shadow-primary/30 p-2 sm:p-4 ${
+              scrolled ? "border-2" : "border-4"
+            }`}
           >
             {siteSettings?.logo_url_display ? (
-              <img src={siteSettings.logo_url_display} alt={siteSettings.site_name} className="h-8 w-8 object-contain" />
+              <img 
+                src={siteSettings.logo_url_display} 
+                alt="" 
+                className="h-full w-full object-contain" 
+                style={{ imageRendering: "-webkit-optimize-contrast", backfaceVisibility: "hidden" }}
+              />
             ) : (
-              <Cross className="h-7 w-7 md:h-8 md:w-8 text-emerald-600 group-hover:text-white transition-colors" strokeWidth={1.5} />
+              <Cross className="h-12 w-12 text-emerald-600 group-hover:text-white transition-colors" strokeWidth={1} />
             )}
           </motion.div>
           <div className="flex flex-col">
@@ -82,7 +97,6 @@ const Header = () => {
             </span>
           </div>
         </Link>
-
         {/* 🧭 Premium Desktop Nav */}
         <nav className="hidden lg:flex items-center gap-2 xl:gap-4">
           {navItems.map((item) => (

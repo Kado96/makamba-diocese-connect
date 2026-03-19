@@ -49,7 +49,6 @@ interface AdminLayoutProps {
 
 const sidebarItems = [
     { icon: LayoutDashboard, labelKey: "admin_dashboard", href: "/admin", color: "text-blue-500", adminOnly: false },
-    { icon: Layers, labelKey: "admin_home", href: "/admin/homepage", color: "text-indigo-400", adminOnly: true },
     { icon: Library, labelKey: "admin_diocese", href: "/admin/diocese", color: "text-violet-500", adminOnly: true },
     { icon: MapPin, labelKey: "admin_parishes", href: "/admin/parishes", color: "text-emerald-500", adminOnly: true },
     { icon: Users, labelKey: "admin_ministries", href: "/admin/ministries", color: "text-blue-400", adminOnly: true },
@@ -57,7 +56,6 @@ const sidebarItems = [
     { icon: Quote, labelKey: "admin_testimonials", href: "/admin/testimonials", color: "text-amber-500", adminOnly: true },
     { icon: Radio, labelKey: "admin_resources", href: "/admin/sermons", color: "text-rose-500", adminOnly: false },
     { icon: UserCog, labelKey: "admin_users_management", href: "/admin/users", color: "text-teal-500", adminOnly: true },
-    { icon: Mail, labelKey: "admin_contact", href: "/admin/settings?tab=contact", color: "text-slate-400", adminOnly: true },
     { icon: Settings, labelKey: "admin_settings", href: "/admin/settings", color: "text-slate-400", adminOnly: true },
     { icon: FileText, labelKey: "admin_manual", href: "/admin/documentation", color: "text-indigo-500", adminOnly: false },
 ];
@@ -254,15 +252,11 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                                 <DropdownMenuItem onClick={() => changeLanguage('fr')} className="flex items-center gap-3 px-3 py-2 cursor-pointer font-medium text-slate-700 hover:bg-slate-50 rounded-lg data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-600">
                                     <span className="text-base">🇫🇷</span> {t('lang_fr', 'Français')}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => changeLanguage('rn')} className="flex items-center gap-3 px-3 py-2 cursor-pointer font-medium text-slate-700 hover:bg-slate-50 rounded-lg data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-600">
-                                    <span className="text-base">🇧🇮</span> {t('lang_rn', 'Kirundi')}
-                                </DropdownMenuItem>
+
                                 <DropdownMenuItem onClick={() => changeLanguage('en')} className="flex items-center gap-3 px-3 py-2 cursor-pointer font-medium text-slate-700 hover:bg-slate-50 rounded-lg data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-600">
                                     <span className="text-base">🇬🇧</span> {t('lang_en', 'English')}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => changeLanguage('sw')} className="flex items-center gap-3 px-3 py-2 cursor-pointer font-medium text-slate-700 hover:bg-slate-50 rounded-lg data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-600">
-                                    <span className="text-base">🇹🇿</span> {t('lang_sw', 'Kiswahili')}
-                                </DropdownMenuItem>
+
                             </DropdownMenuContent>
                         </DropdownMenu>
 

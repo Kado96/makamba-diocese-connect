@@ -14,7 +14,7 @@ const HeroSection = () => {
   const badge = settings?.[`hero_badge_${lang}`] || 'ÉGLISE ANGLICANE DU BURUNDI';
 
   const btn1Text = settings?.[`hero_btn1_text_${lang}`] || t('hero_cta_learn');
-  const btn2Text = settings?.[`hero_btn2_text_${lang}`] || t('nav_news');
+  const btn2Text = settings?.[`hero_btn2_text_${lang}`] || t('hero_cta_visit');
 
   const btn1Link = settings?.[`hero_btn1_link_${lang}`] || "/diocese";
   const btn2Link = settings?.[`hero_btn2_link_${lang}`] || "/actualites";
@@ -49,7 +49,7 @@ const HeroSection = () => {
       </div>
 
       {/* Content */}
-      <div className="relative container mx-auto px-4 py-32 md:py-40">
+      <div className="relative container mx-auto px-4 pt-48 pb-24 md:pt-60 md:pb-32">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}

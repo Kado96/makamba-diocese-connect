@@ -135,6 +135,8 @@ class MakambaSync:
             return {'author_name': item.author_name}
         if model_class == TeamMember:
             return {'name': item.name}
+        if model_class == DiocesePresentation:
+            return {'id': 1} # Singleton
         return None
 
     def sync_model(self, model_class, name):

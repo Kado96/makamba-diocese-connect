@@ -215,8 +215,6 @@ const AdminAnnouncements = () => {
                                             <label htmlFor="announcement-language" className="text-sm font-bold text-slate-700">{t('admin_lang_label', 'Langue')}</label>
                                             <select id="announcement-language" name="language" defaultValue={editingItem?.language || "fr"} className="flex h-12 w-full rounded-xl border border-slate-200 bg-background px-3 py-2 text-sm focus:ring-orange-500">
                                                 <option value="fr">{t('lang_fr', 'Français')}</option>
-                                                <option value="rn">{t('lang_rn', 'Kirundi')}</option>
-                                                <option value="sw">{t('lang_sw', 'Kiswahili')}</option>
                                                 <option value="en">{t('lang_en', 'English')}</option>
                                             </select>
                                         </div>
@@ -302,6 +300,8 @@ const AdminAnnouncements = () => {
                             <div className="relative w-full md:w-96">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                 <Input
+                                    id="search-announcements"
+                                    name="search_announcements"
                                     placeholder={t('admin_search_placeholder', "Rechercher une annonce...")}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
