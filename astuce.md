@@ -198,61 +198,39 @@ Si vous devez déplacer des données, utilisez toujours le script `migrate_annou
 
 ---
 
-## 🗄️ Configuration Supabase Storage (S3) — Le Piège du Double Dossier "media/media"
+## 🗄️ Configuration Supabase Storage (S3) : La Méthode Standard et Robuste
 
 ### Le Problème
-Quand on utilise **Supabase Storage** avec `django-storages` (S3Boto3Storage), les images s'uploadent correctement (visibles dans le dashboard Supabase) mais le site affiche une erreur **CORB** (Cross-Origin Read Blocking) ou une image cassée.
+Le script de synchronisation (Sync) crée un **sous-dossier `media/`** dans le bucket `media`. Pour que les nouveaux fichiers envoyés par l'Administration aillent au même endroit, il faut une configuration précise.
 
-**Symptôme :** Chrome bloque car il reçoit une page d'erreur HTML/JSON "404" au lieu du fichier image.
+**Structure Réelle :**
+`https://[project].supabase.co/storage/v1/object/public/media/media/[dossier]/[fichier.jpg]`
+1. Premier `media` = Nom du Bucket.
+2. Deuxième `media` = Sous-dossier (pour l'organisation).
 
-### La Cause Racine
-Le script `sync_local_to_prod.py` crée un **sous-dossier `media/`** à l'intérieur du bucket `media`. La structure réelle est donc :
-```
-Bucket: media (PUBLIC)
-  └── media/              ← Sous-dossier créé par le sync
-      ├── diocese/
-      │   └── bishop-photo.jpg
-      ├── settings/
-      │   └── design-sans-titre.png
-      └── ...
-```
-En base de données, Django stocke les chemins **sans** le préfixe `media/` :
-- `settings/design-sans-titre.png`
-- `diocese/bishop-photo.jpg`
+### La Solution (Configuration Définitive)
 
-L'URL publique complète qui fonctionne est donc :
-`https://ID.supabase.co/storage/v1/object/public/media/media/settings/design-sans-titre.png`
-- Premier `media` = **nom du bucket**
-- Deuxième `media` = **sous-dossier** dans le bucket
-
-### La Solution
-
-**`settings.py`** — Inclure le sous-dossier `/media` dans le domaine personnalisé :
-```python
-PROJECT_ID = AWS_S3_ENDPOINT_URL.split('//')[1].split('.')[0]
-# CRITIQUE: Le chemin doit inclure bucket_name + '/media' (le sous-dossier)
-AWS_S3_CUSTOM_DOMAIN = f"{PROJECT_ID}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/media"
-MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
-```
-
-**`api/utils/storage.py`** — NE PAS ajouter `location = 'media'` !
+**1. `api/utils/storage.py`** — Utiliser `location` :
 ```python
 class CleanS3Boto3Storage(S3Boto3Storage):
-    # NE PAS mettre location = 'media' ici !
-    # Ajouter location créerait un TRIPLE dossier : .../media/media/media/... = 404 !
-    pass
+    # CRITIQUE: Force l'écriture dans le sous-dossier 'media/'
+    location = 'media'
 ```
 
-### Comment Vérifier
+**2. `settings.py`** — Domaine propre :
 ```python
-import urllib.request
-url = "https://VOTRE_ID.supabase.co/storage/v1/object/public/media/media/settings/logo.png"
-print(urllib.request.urlopen(url).getcode())  # Doit retourner 200
+# On pointe l'URL de base vers le BUCKET seulement :
+AWS_S3_CUSTOM_DOMAIN = f"{PROJECT_ID}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+
+# Résultat auto-généré par Django: 
+# DOMAIN (public/media) + LOCATION (media) + PATH (settings/logo.png)
+# = .../public/media/media/settings/logo.png ✅
 ```
 
-### Règle d'Or
-> Avant de configurer, **vérifiez dans le dashboard Supabase** le chemin réel de vos fichiers.
-> Puis construisez `AWS_S3_CUSTOM_DOMAIN` pour que `MEDIA_URL + chemin_en_db` = URL réelle du fichier.
+### Pourquoi c'est la meilleure méthode ?
+Django-storages construit l'URL en faisant `DOMAINE + LOCATION + NOM`. En mettant le sous-dossier dans **`location`**, vous permettez à Django de savoir exactement où ranger les nouveaux fichiers, tout en garantissant que les anciens (du Sync) restent accessibles au même endroit.
 
 ---
+
 

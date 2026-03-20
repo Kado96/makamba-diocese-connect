@@ -189,13 +189,11 @@ if USE_S3_STORAGE and not USE_LOCAL_SQLITE:
     # L'ID du projet est la partie avant '.storage.supabase.co' dans Endpoint URL
     PROJECT_ID = AWS_S3_ENDPOINT_URL.split('//')[1].split('.')[0]
     
-    # On définit le domaine personnalisé pour pointer vers l'URL publique Supabase
-    # Structure Supabase: bucket 'media' -> sous-dossier 'media/' -> fichiers
-    # DB stocke: 'settings/logo.png' -> URL finale: .../public/media/media/settings/logo.png
-    # Le premier 'media' = nom du bucket, le deuxième 'media' = sous-dossier créé par sync
-    AWS_S3_CUSTOM_DOMAIN = f"{PROJECT_ID}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/media"
+    # On définit le domaine personnalisé pour pointer vers le Bucket Supabase
+    # Note: On s'arrête au Bucket, la 'location' du Storage (media) fera le reste
+    AWS_S3_CUSTOM_DOMAIN = f"{PROJECT_ID}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
     
-    # MEDIA_URL pointe vers le même chemin
+    # MEDIA_URL pointe vers la racine du domaine personnalisé
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
     AWS_S3_FILE_OVERWRITE = False
 else:
