@@ -198,60 +198,61 @@ Si vous devez déplacer des données, utilisez toujours le script `migrate_annou
 
 ---
 
-## 🗄️ Configuration Supabase Storage (S3) — Le Piège du Double Dossier
+## 🗄️ Configuration Supabase Storage (S3) — Le Piège du Double Dossier "media/media"
 
 ### Le Problème
-Quand on utilise **Supabase Storage** avec `django-storages` (S3Boto3Storage), les fichiers peuvent se retrouver dans un **sous-dossier inattendu** à l'intérieur du bucket, créant un décalage entre :
-- L'endroit où Django **écrit** les fichiers (ex: `bucket/diocese/photo.jpg`)
-- L'endroit où Django **lit** les fichiers (ex: `bucket/media/diocese/photo.jpg`)
+Quand on utilise **Supabase Storage** avec `django-storages` (S3Boto3Storage), les images s'uploadent correctement (visibles dans le dashboard Supabase) mais le site affiche une erreur **CORB** (Cross-Origin Read Blocking) ou une image cassée.
 
-**Symptôme :** Les images s'uploadent correctement (visible dans le dashboard Supabase) mais le site affiche une erreur **CORB** (Cross-Origin Read Blocking) ou une image cassée. Chrome bloque car il reçoit une page d'erreur HTML au lieu d'une image.
+**Symptôme :** Chrome bloque car il reçoit une page d'erreur HTML/JSON "404" au lieu du fichier image.
 
 ### La Cause Racine
-Le bucket Supabase `media` contient souvent un sous-dossier `media/` (créé par le script de synchronisation ou un drag & drop manuel). La structure ressemble à :
+Le script `sync_local_to_prod.py` crée un **sous-dossier `media/`** à l'intérieur du bucket `media`. La structure réelle est donc :
 ```
 Bucket: media (PUBLIC)
-  ├── diocese/            ← Fichiers uploadés SANS location
-  │   └── photo.jpg
-  └── media/              ← Fichiers uploadés AVEC location='media'
+  └── media/              ← Sous-dossier créé par le sync
       ├── diocese/
-      │   └── photo.jpg
-      ├── announcements/
+      │   └── bishop-photo.jpg
       ├── settings/
+      │   └── design-sans-titre.png
       └── ...
 ```
+En base de données, Django stocke les chemins **sans** le préfixe `media/` :
+- `settings/design-sans-titre.png`
+- `diocese/bishop-photo.jpg`
 
-### La Solution (2 fichiers à configurer)
+L'URL publique complète qui fonctionne est donc :
+`https://ID.supabase.co/storage/v1/object/public/media/media/settings/design-sans-titre.png`
+- Premier `media` = **nom du bucket**
+- Deuxième `media` = **sous-dossier** dans le bucket
 
-**1. `api/utils/storage.py`** — Forcer le sous-dossier d'écriture :
+### La Solution
+
+**`settings.py`** — Inclure le sous-dossier `/media` dans le domaine personnalisé :
 ```python
-class CleanS3Boto3Storage(S3Boto3Storage):
-    location = 'media'  # ← CRITIQUE : écrit dans bucket/media/
-    
-    def get_available_name(self, name, max_length=None):
-        name = _clean_filename(name)
-        return super().get_available_name(name, max_length)
-```
-
-**2. `settings.py`** — Aligner la lecture sur le même chemin :
-```python
-# L'URL publique doit inclure /media pour correspondre au location='media'
+PROJECT_ID = AWS_S3_ENDPOINT_URL.split('//')[1].split('.')[0]
+# CRITIQUE: Le chemin doit inclure bucket_name + '/media' (le sous-dossier)
 AWS_S3_CUSTOM_DOMAIN = f"{PROJECT_ID}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/media"
 MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 ```
 
+**`api/utils/storage.py`** — NE PAS ajouter `location = 'media'` !
+```python
+class CleanS3Boto3Storage(S3Boto3Storage):
+    # NE PAS mettre location = 'media' ici !
+    # Ajouter location créerait un TRIPLE dossier : .../media/media/media/... = 404 !
+    pass
+```
+
 ### Comment Vérifier
-Tester manuellement que les URLs fonctionnent :
 ```python
 import urllib.request
-# Doit retourner 200 :
-url = "https://VOTRE_ID.supabase.co/storage/v1/object/public/media/media/diocese/photo.jpg"
-print(urllib.request.urlopen(url).getcode())
+url = "https://VOTRE_ID.supabase.co/storage/v1/object/public/media/media/settings/logo.png"
+print(urllib.request.urlopen(url).getcode())  # Doit retourner 200
 ```
 
 ### Règle d'Or
-> **`location` dans le Storage** et **`/media` dans l'URL publique** doivent TOUJOURS être synchronisés.
-> Si `location = 'media'`, alors `AWS_S3_CUSTOM_DOMAIN` doit finir par `/media`.
-> Si `location = ''` (vide), alors `AWS_S3_CUSTOM_DOMAIN` ne doit PAS avoir `/media`.
+> Avant de configurer, **vérifiez dans le dashboard Supabase** le chemin réel de vos fichiers.
+> Puis construisez `AWS_S3_CUSTOM_DOMAIN` pour que `MEDIA_URL + chemin_en_db` = URL réelle du fichier.
 
 ---
+

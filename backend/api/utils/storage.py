@@ -25,10 +25,11 @@ def _clean_filename(name):
 class CleanS3Boto3Storage(S3Boto3Storage):
     """Stockage S3 pour Supabase avec nettoyage.
     
-    Les fichiers sont stockés dans le sous-dossier 'media/' du bucket Supabase.
-    Cela correspond à la structure: bucket/media/diocese/photo.jpg
+    Note: Ne PAS ajouter location='media' ici !
+    Les chemins en base de données contiennent déjà le préfixe 'media/' 
+    (ex: 'media/settings/logo.png') et AWS_S3_CUSTOM_DOMAIN dans settings.py
+    inclut aussi '/media'. Ajouter location créerait un triple dossier.
     """
-    location = 'media'
     
     def get_available_name(self, name, max_length=None):
         name = _clean_filename(name)
