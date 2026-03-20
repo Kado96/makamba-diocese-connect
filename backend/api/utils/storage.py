@@ -23,7 +23,13 @@ def _clean_filename(name):
     return os.path.join(directory, cleaned_filename).replace('\\', '/')
 
 class CleanS3Boto3Storage(S3Boto3Storage):
-    """Stockage S3 pour Supabase avec nettoyage."""
+    """Stockage S3 pour Supabase avec nettoyage.
+    
+    Les fichiers sont stockés dans le sous-dossier 'media/' du bucket Supabase.
+    Cela correspond à la structure: bucket/media/diocese/photo.jpg
+    """
+    location = 'media'
+    
     def get_available_name(self, name, max_length=None):
         name = _clean_filename(name)
         return super().get_available_name(name, max_length)
