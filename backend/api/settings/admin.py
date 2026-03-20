@@ -46,22 +46,6 @@ class SiteSettingsAdmin(admin.ModelAdmin):
             ),
             "classes": ("collapse",),
         }),
-        ("Section À Propos - Textes (RN)", {
-            "fields": (
-                "about_badge_rn", "about_title_rn", "about_title_accent_rn", "about_content_rn",
-                "about_feature1_rn", "about_feature2_rn", "about_feature3_rn", "about_feature4_rn",
-                "stat_years_label_rn",
-            ),
-            "classes": ("collapse",),
-        }),
-        ("Section À Propos - Textes (SW)", {
-            "fields": (
-                "about_badge_sw", "about_title_sw", "about_title_accent_sw", "about_content_sw",
-                "about_feature1_sw", "about_feature2_sw", "about_feature3_sw", "about_feature4_sw",
-                "stat_years_label_sw",
-            ),
-            "classes": ("collapse",),
-        }),
         ("Citation du Pasteur", {
             "fields": ("quote_author_image",),
             "description": "Photo du pasteur affichée à côté de la citation."
@@ -74,14 +58,6 @@ class SiteSettingsAdmin(admin.ModelAdmin):
             "fields": ("quote_text_en", "quote_author_name_en", "quote_author_subtitle_en"),
             "classes": ("collapse",),
         }),
-        ("Citation du Pasteur - Textes (RN)", {
-            "fields": ("quote_text_rn", "quote_author_name_rn", "quote_author_subtitle_rn"),
-            "classes": ("collapse",),
-        }),
-        ("Citation du Pasteur - Textes (SW)", {
-            "fields": ("quote_text_sw", "quote_author_name_sw", "quote_author_subtitle_sw"),
-            "classes": ("collapse",),
-        }),
         ("Section Équipe", {
             "fields": ("team_image",),
             "description": "Photo de l'équipe affichée dans la section Équipe."
@@ -92,14 +68,6 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         }),
         ("Section Équipe - Textes (EN)", {
             "fields": ("team_title_en", "team_description_en"),
-            "classes": ("collapse",),
-        }),
-        ("Section Équipe - Textes (RN)", {
-            "fields": ("team_title_rn", "team_description_rn"),
-            "classes": ("collapse",),
-        }),
-        ("Section Équipe - Textes (SW)", {
-            "fields": ("team_title_sw", "team_description_sw"),
             "classes": ("collapse",),
         }),
         ("Contact", {
