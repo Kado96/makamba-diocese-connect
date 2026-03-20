@@ -198,4 +198,60 @@ Si vous devez déplacer des données, utilisez toujours le script `migrate_annou
 
 ---
 
+## 🗄️ Configuration Supabase Storage (S3) — Le Piège du Double Dossier
+
+### Le Problème
+Quand on utilise **Supabase Storage** avec `django-storages` (S3Boto3Storage), les fichiers peuvent se retrouver dans un **sous-dossier inattendu** à l'intérieur du bucket, créant un décalage entre :
+- L'endroit où Django **écrit** les fichiers (ex: `bucket/diocese/photo.jpg`)
+- L'endroit où Django **lit** les fichiers (ex: `bucket/media/diocese/photo.jpg`)
+
+**Symptôme :** Les images s'uploadent correctement (visible dans le dashboard Supabase) mais le site affiche une erreur **CORB** (Cross-Origin Read Blocking) ou une image cassée. Chrome bloque car il reçoit une page d'erreur HTML au lieu d'une image.
+
+### La Cause Racine
+Le bucket Supabase `media` contient souvent un sous-dossier `media/` (créé par le script de synchronisation ou un drag & drop manuel). La structure ressemble à :
+```
+Bucket: media (PUBLIC)
+  ├── diocese/            ← Fichiers uploadés SANS location
+  │   └── photo.jpg
+  └── media/              ← Fichiers uploadés AVEC location='media'
+      ├── diocese/
+      │   └── photo.jpg
+      ├── announcements/
+      ├── settings/
+      └── ...
+```
+
+### La Solution (2 fichiers à configurer)
+
+**1. `api/utils/storage.py`** — Forcer le sous-dossier d'écriture :
+```python
+class CleanS3Boto3Storage(S3Boto3Storage):
+    location = 'media'  # ← CRITIQUE : écrit dans bucket/media/
+    
+    def get_available_name(self, name, max_length=None):
+        name = _clean_filename(name)
+        return super().get_available_name(name, max_length)
+```
+
+**2. `settings.py`** — Aligner la lecture sur le même chemin :
+```python
+# L'URL publique doit inclure /media pour correspondre au location='media'
+AWS_S3_CUSTOM_DOMAIN = f"{PROJECT_ID}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/media"
+MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+```
+
+### Comment Vérifier
+Tester manuellement que les URLs fonctionnent :
+```python
+import urllib.request
+# Doit retourner 200 :
+url = "https://VOTRE_ID.supabase.co/storage/v1/object/public/media/media/diocese/photo.jpg"
+print(urllib.request.urlopen(url).getcode())
+```
+
+### Règle d'Or
+> **`location` dans le Storage** et **`/media` dans l'URL publique** doivent TOUJOURS être synchronisés.
+> Si `location = 'media'`, alors `AWS_S3_CUSTOM_DOMAIN` doit finir par `/media`.
+> Si `location = ''` (vide), alors `AWS_S3_CUSTOM_DOMAIN` ne doit PAS avoir `/media`.
+
 ---
