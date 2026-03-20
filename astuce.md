@@ -12,6 +12,12 @@
 - Les accès API sont protégés par des tokens **JWT**.
 - En production (Render/Supabase), les fichiers statiques sont servis via **WhiteNoise**.
 
+## 📁 Système de Nommage des Fichiers (Nettoyage)
+Pour éviter que les images ne "cassent" lors du transfert de Windows (Local) vers Linux (Production/Render), le projet intègre un système de nettoyage automatique (Slugify) :
+- **Nettoyage Universel** : Les accents sont supprimés, les espaces deviennent des tirets (ex: `L'Évêque à Makamba.JPG` ➔ `l-eveque-a-makamba.jpg`).
+- **Compatibilité S3** : Ce système est actif aussi bien pour le stockage local que pour **Supabase Storage**.
+- **Stabilité des URLs** : Garanti que les liens vers vos documents et images restent valides sur tous les navigateurs.
+
 ---
 
 ## 🏗️ Architecture Technique : Synchronisation (Modèle Réutilisable)

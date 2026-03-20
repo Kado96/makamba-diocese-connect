@@ -94,31 +94,45 @@ class MakambaSync:
         for field in instance._meta.fields:
             if field.name == 'id': continue
             
-            val = getattr(instance, field.name)
-            
-            if field.is_relation and val:
-                data[f"{field.name}_id"] = val.id
-            elif hasattr(val, 'url'):  # C'est un FileField / ImageField
-                if val:
-                    # ✅ SÉCURITÉ PRODUCTION (astuce.md point 114)
-                    # Si on est en local et qu'on synchronise vers la prod qui utilise S3
-                    if settings.USE_S3_STORAGE and not val.storage.__class__.__name__.startswith('CleanS3'):
-                        try:
-                            # On essaye d'uploader le fichier local vers S3 si possible
-                            # via le système de stockage par défaut (qui devrait être S3 en config prod)
-                            from django.core.files.storage import default_storage
-                            if not default_storage.exists(val.name):
-                                logger.info(f"    [FILE] Uploading {val.name} to Production Storage...")
-                                with val.open('rb') as f:
-                                    default_storage.save(val.name, f)
-                        except Exception as e:
-                            logger.warning(f"    ⚠️ Impossible d'uploader le fichier {val.name}: {e}")
-                    
-                    data[field.name] = val.name
+            try:
+                val = getattr(instance, field.name)
+                
+                if field.is_relation and val:
+                    data[f"{field.name}_id"] = val.id
+                elif hasattr(val, 'url'):  # C'est un FileField / ImageField
+                    try:
+                        # ✅ SÉCURITÉ PRODUCTION (astuce.md point 114)
+                        # On vérifie explicitement si le champ a un nom (fichier assigné)
+                        if val and hasattr(val, 'name') and val.name:
+                            # Si on est en local et qu'on synchronise vers la prod qui utilise S3
+                            if settings.USE_S3_STORAGE and not val.storage.__class__.__name__.startswith('CleanS3'):
+                                try:
+                                    # Vérifier si le fichier existe localement avant de l'ouvrir
+                                    from django.core.files.storage import default_storage
+                                    if val.storage.exists(val.name):
+                                        if not default_storage.exists(val.name):
+                                            logger.info(f"    [FILE] Uploading {val.name} to Production Storage...")
+                                            with val.open('rb') as f:
+                                                default_storage.save(val.name, f)
+                                    else:
+                                        logger.warning(f"    ⚠️ Fichier local manquant pour {field.name}: {val.name}")
+                                except Exception as file_err:
+                                    logger.warning(f"    ⚠️ Erreur upload {field.name}: {file_err}")
+                            
+                            data[field.name] = val.name
+                        else:
+                            data[field.name] = None
+                    except (ValueError, AttributeError):
+                        # Catch "The '...' attribute has no file associated with it."
+                        data[field.name] = None
+                    except Exception as e:
+                        logger.warning(f"    ⚠️ Erreur sur champ Image/File {field.name}: {e}")
+                        data[field.name] = None
                 else:
-                    data[field.name] = None
-            else:
-                data[field.name] = val
+                    data[field.name] = val
+            except Exception as e:
+                logger.warning(f"    ⚠️ Erreur extraction champ {field.name}: {e}")
+                data[field.name] = None
         return data
 
     def __init__(self, dry_run=False):
@@ -139,17 +153,18 @@ class MakambaSync:
         if model_class == SiteSettings:
             return {'id': 1} # Singleton
         if model_class == Parish:
-            return {'name': item.name}
+            return {'name': item.name, 'language': item.language}
         if model_class == Ministry:
-            return {'title': item.title, 'language': item.language}
+            return {'title_fr': item.title_fr}
         if model_class == SermonCategory:
-            return {'name': item.name}
+            return {'name_fr': item.name_fr}
         if model_class == Sermon:
-            return {'title': item.title, 'preacher_name': item.preacher_name}
+            return {'title_fr': item.title_fr, 'preacher_name': item.preacher_name}
         if model_class == Announcement:
-            return {'title': item.title, 'language': item.language}
+            # Nouveau format bilingue intégré
+            return {'title_fr': item.title_fr}
         if model_class == Testimonial:
-            return {'author_name': item.author_name}
+            return {'author_name': item.author_name, 'language': item.language}
         if model_class == TeamMember:
             return {'name': item.name}
         if model_class == DiocesePresentation:
@@ -226,36 +241,35 @@ class MakambaSync:
         logger.info(f"{'⚠️ MODE SIMULATION' if self.dry_run else '🚀 MODE RÉEL'}")
         
         try:
-            with transaction.atomic(using='prod'):
-                # 1. Base
-                self.sync_model(User, "Utilisateurs")
-                self.sync_model(Account, "Profils")
-                self.sync_model(SiteSettings, "Paramètres Site")
-                
-                # 2. Contenu Indépendant
-                self.sync_model(SermonCategory, "Catégories Sermons")
-                self.sync_model(Testimonial, "Témoignages")
-                self.sync_model(Announcement, "Annonces/Articles")
-                self.sync_model(Parish, "Paroisses")
-                self.sync_model(Ministry, "Ministères")
-                
-                # 3. Contenu Dépendant
-                self.sync_model(Sermon, "Sermons")
-                self.sync_model(MinistryActivity, "Activités Ministères")
-                
-                # 4. Pages
-                self.sync_model(TimelineEvent, "Évènements Timeline")
-                self.sync_model(VisionValue, "Valeurs Vision")
-                self.sync_model(MissionAxe, "Axes Mission")
-                self.sync_model(TeamMember, "Membres Équipe")
-                self.sync_model(DiocesePresentation, "Présentation Diocèse")
+            # 1. Base
+            self.sync_model(User, "Utilisateurs")
+            self.sync_model(Account, "Profils")
+            self.sync_model(SiteSettings, "Paramètres Site")
+            
+            # 2. Contenu Indépendant
+            self.sync_model(SermonCategory, "Catégories Sermons")
+            self.sync_model(Testimonial, "Témoignages")
+            self.sync_model(Announcement, "Annonces/Articles")
+            self.sync_model(Parish, "Paroisses")
+            self.sync_model(Ministry, "Ministères")
+            
+            # 3. Contenu Dépendant
+            self.sync_model(Sermon, "Sermons")
+            self.sync_model(MinistryActivity, "Activités Ministères")
+            
+            # 4. Pages
+            self.sync_model(TimelineEvent, "Évènements Timeline")
+            self.sync_model(VisionValue, "Valeurs Vision")
+            self.sync_model(MissionAxe, "Axes Mission")
+            self.sync_model(TeamMember, "Membres Équipe")
+            self.sync_model(DiocesePresentation, "Présentation Diocèse")
 
             logger.info("\n" + "="*30)
             logger.info(f"RÉSULTAT: {self.stats['created']} créés, {self.stats['updated']} mis à jour, {self.stats['errors']} erreurs.")
             logger.info("="*30)
             
         except Exception as e:
-            logger.error(f"❌ Erreur critique lors de la transaction: {e}")
+            logger.error(f"❌ Erreur critique lors de la synchronisation: {e}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
