@@ -166,7 +166,9 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 USE_S3_STORAGE = os.environ.get("USE_S3_STORAGE", "False").lower() == "true"
 
-if USE_S3_STORAGE:
+# On n'active S3 que si on est en prod réelle (USE_LOCAL_SQLITE=False)
+# OU si on est forcé par un script spécifique
+if USE_S3_STORAGE and not USE_LOCAL_SQLITE:
     if 'storages' not in INSTALLED_APPS:
         INSTALLED_APPS.append('storages')
     

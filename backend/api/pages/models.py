@@ -153,9 +153,6 @@ class DiocesePresentation(models.Model):
     hero_title_fr = models.CharField(max_length=255, verbose_name="Titre Hero (FR)", blank=True, null=True, default="Le Diocèse")
     hero_title_en = models.CharField(max_length=255, verbose_name="Titre Hero (EN)", blank=True, null=True, default="The Diocese")
 
-    hero_subtitle_fr = models.TextField(verbose_name="Sous-titre Hero (FR)", blank=True, null=True)
-    hero_subtitle_en = models.TextField(verbose_name="Sous-titre Hero (EN)", blank=True, null=True)
-
     nav_history_fr = models.CharField(max_length=255, verbose_name="Label Nav Historique (FR)", blank=True, null=True, default="Historique")
     nav_history_en = models.CharField(max_length=255, verbose_name="Label Nav Historique (EN)", blank=True, null=True, default="History")
 

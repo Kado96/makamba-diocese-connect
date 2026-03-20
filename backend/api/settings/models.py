@@ -318,16 +318,6 @@ class SiteSettings(models.Model):
     stats_cta_link_text_en = models.CharField(max_length=100, blank=True, default="Learn more")
     stats_cta_href = models.CharField(max_length=255, blank=True, default="/diocese")
 
-    # Stats descriptions (multilingue)
-    stat_years_desc_fr = models.CharField(max_length=200, blank=True, default="au service de Dieu")
-    stat_years_desc_en = models.CharField(max_length=200, blank=True, default="serving God")
-    stat_emissions_desc_fr = models.CharField(max_length=200, blank=True, default="Diffusées")
-    stat_emissions_desc_en = models.CharField(max_length=200, blank=True, default="Broadcast")
-    stat_audience_desc_fr = models.CharField(max_length=200, blank=True, default="Audience globale")
-    stat_audience_desc_en = models.CharField(max_length=200, blank=True, default="Global audience")
-    stat_languages_desc_fr = models.CharField(max_length=200, blank=True, default="Abordées")
-    stat_languages_desc_en = models.CharField(max_length=200, blank=True, default="Covered")
-
     # Section background images
     vision_bg_image = models.ImageField(upload_to='settings/', blank=True, null=True, help_text="Image de fond section Vision")
     engage_bg_image = models.ImageField(upload_to='settings/', blank=True, null=True, help_text="Image de fond section Engagement")

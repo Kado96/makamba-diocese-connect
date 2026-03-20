@@ -104,20 +104,24 @@ class MakambaSync:
                         # ✅ SÉCURITÉ PRODUCTION (astuce.md point 114)
                         # On vérifie explicitement si le champ a un nom (fichier assigné)
                         if val and hasattr(val, 'name') and val.name:
-                            # Si on est en local et qu'on synchronise vers la prod qui utilise S3
-                            if settings.USE_S3_STORAGE and not val.storage.__class__.__name__.startswith('CleanS3'):
-                                try:
-                                    # Vérifier si le fichier existe localement avant de l'ouvrir
-                                    from django.core.files.storage import default_storage
-                                    if val.storage.exists(val.name):
-                                        if not default_storage.exists(val.name):
-                                            logger.info(f"    [FILE] Uploading {val.name} to Production Storage...")
-                                            with val.open('rb') as f:
-                                                default_storage.save(val.name, f)
+                            # 🔄 SYNC STORAGE: On force l'upload vers S3 pour la prod
+                            from api.utils.storage import CleanS3Boto3Storage
+                            prod_storage = CleanS3Boto3Storage()
+                            
+                            try:
+                                # Vérifier si le fichier existe localement
+                                if val.storage.exists(val.name):
+                                    if not prod_storage.exists(val.name):
+                                        logger.info(f"    [FILE] Uploading {val.name} to Production Storage (S3)...")
+                                        with val.open('rb') as f:
+                                            prod_storage.save(val.name, f)
                                     else:
-                                        logger.warning(f"    ⚠️ Fichier local manquant pour {field.name}: {val.name}")
-                                except Exception as file_err:
-                                    logger.warning(f"    ⚠️ Erreur upload {field.name}: {file_err}")
+                                        # Le fichier existe déjà en prod S3
+                                        pass 
+                                else:
+                                    logger.warning(f"    ⚠️ Fichier local manquant pour {field.name}: {val.name}")
+                            except Exception as file_err:
+                                logger.warning(f"    ⚠️ Erreur upload S3 {field.name}: {file_err}")
                             
                             data[field.name] = val.name
                         else:
@@ -156,17 +160,26 @@ class MakambaSync:
             return {'name': item.name, 'language': item.language}
         if model_class == Ministry:
             return {'title_fr': item.title_fr}
+        if model_class == MinistryActivity:
+            # On identifie par titre et son ministère parent (traduit)
+            min_id = self.id_map.get('Ministry', {}).get(item.ministry_id, item.ministry_id)
+            return {'ministry_id': min_id, 'title_fr': item.title_fr}
         if model_class == SermonCategory:
             return {'name_fr': item.name_fr}
         if model_class == Sermon:
             return {'title_fr': item.title_fr, 'preacher_name': item.preacher_name}
         if model_class == Announcement:
-            # Nouveau format bilingue intégré
             return {'title_fr': item.title_fr}
         if model_class == Testimonial:
             return {'author_name': item.author_name, 'language': item.language}
         if model_class == TeamMember:
             return {'name': item.name}
+        if model_class == TimelineEvent:
+            return {'year': item.year, 'title_fr': item.title_fr}
+        if model_class == MissionAxe:
+            return {'text_fr': item.text_fr}
+        if model_class == VisionValue:
+            return {'title_fr': item.title_fr}
         if model_class == DiocesePresentation:
             return {'id': 1} # Singleton
         return None
@@ -201,6 +214,12 @@ class MakambaSync:
                     prod_obj_query = model_class.objects.using('prod').filter(id=item.id)
                     
                     if not prod_obj_query.exists():
+                        # Essayer par Slug (très stable pour identifier un contenu)
+                        if hasattr(item, 'slug') and item.slug:
+                            prod_obj_query = model_class.objects.using('prod').filter(slug=item.slug)
+                        
+                    if not prod_obj_query.exists():
+                        # Enfin par Critères Naturels (Nom, Titre, etc.)
                         natural_criteria = self._get_natural_query(model_class, item)
                         if natural_criteria:
                             prod_obj_query = model_class.objects.using('prod').filter(**natural_criteria)

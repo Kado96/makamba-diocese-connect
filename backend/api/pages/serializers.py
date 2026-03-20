@@ -134,9 +134,7 @@ class DiocesePresentationSerializer(serializers.ModelSerializer):
             'values_badge_fr', 'values_badge_rn', 'values_badge_en', 'values_badge_sw',
             # Bishop Title
             'bishop_title_fr', 'bishop_title_rn', 'bishop_title_en', 'bishop_title_sw',
-            # Hero & Nav
             'hero_title_fr', 'hero_title_rn', 'hero_title_en', 'hero_title_sw',
-            'hero_subtitle_fr', 'hero_subtitle_rn', 'hero_subtitle_en', 'hero_subtitle_sw',
             'nav_history_fr', 'nav_history_rn', 'nav_history_en', 'nav_history_sw',
             'nav_bishop_fr', 'nav_bishop_rn', 'nav_bishop_en', 'nav_bishop_sw',
             'nav_vision_fr', 'nav_vision_rn', 'nav_vision_en', 'nav_vision_sw',
