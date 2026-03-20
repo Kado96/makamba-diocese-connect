@@ -190,8 +190,7 @@ if USE_S3_STORAGE and not USE_LOCAL_SQLITE:
     PROJECT_ID = AWS_S3_ENDPOINT_URL.split('//')[1].split('.')[0]
     
     # On définit le domaine personnalisé pour pointer vers l'URL publique Supabase
-    # Cela inclut le bucket ET le dossier intermédiaire 'media/'
-    AWS_S3_CUSTOM_DOMAIN = f"{PROJECT_ID}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}/media"
+    AWS_S3_CUSTOM_DOMAIN = f"{PROJECT_ID}.supabase.co/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
     
     # Harmonisation de MEDIA_URL
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
